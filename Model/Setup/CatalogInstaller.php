@@ -4,7 +4,6 @@ namespace MauroNigrele\SetupTools\Model\Setup;
 
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\CategoryFactory;
-
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\ObjectManagerInterface;

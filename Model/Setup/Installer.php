@@ -2,8 +2,6 @@
 
 namespace MauroNigrele\SetupTools\Model\Setup;
 
-
-
 use Magento\Framework\DataObject;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -11,7 +9,6 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 //use Magento\Framework\Setup\ModuleContextInterface;
 //use Magento\Framework\Setup\SetupInterface;
-
 use Psr\Log\LoggerInterface;
 
 
