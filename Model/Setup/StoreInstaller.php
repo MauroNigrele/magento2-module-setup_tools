@@ -179,6 +179,7 @@ class StoreInstaller extends AbstractInstaller
 
     /**
      * @param array $configSchema
+     * @return $this
      */
     public function setConfigSchema(Array $configSchema)
     {
@@ -234,7 +235,7 @@ class StoreInstaller extends AbstractInstaller
             if ($theme->getId()){
                 $this->setConfig('design/theme/theme_id', $theme->getId());
             } else {
-                $this->logger->warning(__('There is no Theme with code: %s', $configSchema['default']));
+                $this->logger->warning(__('There is no Theme with code: %1', $configSchema['default']));
             }
         }
 
@@ -245,7 +246,7 @@ class StoreInstaller extends AbstractInstaller
                 $theme = $this->themeFactory->create()->load($themeCode, 'code');
                 // Website Validation
                 if (!$website->getId()){
-                    $this->logger->warning(__('There is no Website with code: %s', $code));
+                    $this->logger->warning(__('There is no Website with code: %1', $code));
                     continue;
                 }
                 // Theme Validation

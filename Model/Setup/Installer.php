@@ -5,20 +5,19 @@ namespace MauroNigrele\SetupTools\Model\Setup;
 
 
 use Magento\Framework\DataObject;
-
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
-use Magento\Framework\Setup\ModuleContextInterface;
-use Magento\Framework\Setup\SetupInterface;
+//use Magento\Framework\Setup\ModuleContextInterface;
+//use Magento\Framework\Setup\SetupInterface;
 
 use Psr\Log\LoggerInterface;
 
 
 class Installer extends AbstractInstaller
 {
-    private $isInitialized = false;
+//    private $isInitialized = false;
 
     /**
      * @var StoreInstaller
@@ -41,25 +40,22 @@ class Installer extends AbstractInstaller
     protected $salesInstaller;
 
     public function __construct(
-        // Parent
         ObjectManagerInterface $objectManager,
         Registry $registry,
         LoggerInterface $logger,
         ScopeConfigInterface $config,
         WriterInterface $configWriter,
-        // This
-//        CatalogInstaller $catalogInstaller,
-//        CustomerInstaller $customerInstaller,
-//        SalesInstaller $salesInstaller,
+        CatalogInstaller $catalogInstaller,
+        CustomerInstaller $customerInstaller,
+        SalesInstaller $salesInstaller,
         StoreInstaller $storeInstaller
     )
     {
         // Installers
         $this->storeInstaller = $storeInstaller;
-//        $this->catalogInstaller = $catalogInstaller;
-//        $this->salesInstaller = $salesInstaller;
-//        $this->customerInstaller = $customerInstaller;
-
+        $this->catalogInstaller = $catalogInstaller;
+        $this->salesInstaller = $salesInstaller;
+        $this->customerInstaller = $customerInstaller;
         // Parent
         parent::__construct($objectManager,$registry,$logger,$config,$configWriter);
     }
