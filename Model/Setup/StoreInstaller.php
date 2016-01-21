@@ -96,6 +96,21 @@ class StoreInstaller extends AbstractInstaller
         'include_in_menu' => 1,
     );
 
+    /**
+     * StoreInstaller constructor.
+     * @param ObjectManagerInterface $objectManager
+     * @param Registry $registry
+     * @param LoggerInterface $logger
+     * @param ScopeConfigInterface $config
+     * @param WriterInterface $configWriter
+     * @param StoreManagerInterface $storeManager
+     * @param StoreFactory $storeFactory
+     * @param GroupFactory $groupFactory
+     * @param WebsiteFactory $websiteFactory
+     * @param CategoryFactory $categoryFactory
+     * @param ThemeFactory $themeFactory
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
         // Parent
         ObjectManagerInterface $objectManager,
@@ -195,7 +210,7 @@ class StoreInstaller extends AbstractInstaller
                 $website = $this->getWebsite($code);
                 // Website Validation
                 if(!$website->getId()) {
-                    $this->logger->warning(__('There is no Website with code: %s', $code));
+                    $this->logger->warning(__('There is no Website with code: %1', $code));
                     continue;
                 }
                 foreach($websiteConfig as $path => $value) {
@@ -209,7 +224,7 @@ class StoreInstaller extends AbstractInstaller
                 $store = $this->getStore($code);
                 // Store Validation
                 if(!$store->getId()) {
-                    $this->logger->warning(__('There is no Store with code: %s', $code));
+                    $this->logger->warning(__('There is no Store with code: %1', $code));
                     continue;
                 }
                 foreach($storeConfig as $path => $value) {
@@ -251,7 +266,7 @@ class StoreInstaller extends AbstractInstaller
                 }
                 // Theme Validation
                 if (!$theme->getId()){
-                    $this->logger->warning(__('There is no Theme with code: %s', $themeCode));
+                    $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
                     continue;
                 }
                 // Set Config
@@ -266,12 +281,12 @@ class StoreInstaller extends AbstractInstaller
                 $theme = $this->themeFactory->create()->load($themeCode, 'code');
                 // Store Validation
                 if (!$store->getId()){
-                    $this->logger->warning(__('There is no Store with code: %s', $code));
+                    $this->logger->warning(__('There is no Store with code: %1', $code));
                     continue;
                 }
                 // Theme Validation
                 if (!$theme->getId()){
-                    $this->logger->warning(__('There is no Theme with code: %s', $themeCode));
+                    $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
                     continue;
                 }
                 // Set Config
@@ -384,7 +399,7 @@ class StoreInstaller extends AbstractInstaller
         $errors = array();
         foreach ($neededKeys as $neededKey) {
             if(!in_array($neededKey, $dataKeys)) {
-                $errors[] = _('%s: is a needed field.', $neededKey);
+                $errors[] = _('%1: is a needed field.', $neededKey);
             }
         }
         if (count($errors)) {
@@ -411,7 +426,7 @@ class StoreInstaller extends AbstractInstaller
         // Validate Already Exists
         $store = $this->getStore($data['code']);
         if ($store->getId()) {
-            throw new AlreadyExistsException(__('A store with code: %s already exists.', $data['code']));
+            throw new AlreadyExistsException(__('A store with code: %1 already exists.', $data['code']));
         }
 
         return $this;
@@ -494,8 +509,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function deleteStore($id, $field = 'code')
     {
-        $store = $this->storeFactory->create()
-            ->load($id,$field);
+        $store = $this->getStore($id,$field);
         /* @var \Magento\Store\Model\Store $store **/
 
         if (!$store->getId()) {
@@ -524,7 +538,7 @@ class StoreInstaller extends AbstractInstaller
         // Validate Already Exists
         $group = $this->getGroup($data['name']);
         if ($group->getId()) {
-            throw new AlreadyExistsException(__('A Store Group with name: %s, already exists.', $data['name']));
+            throw new AlreadyExistsException(__('A Store Group with name: %1, already exists.', $data['name']));
         }
 
         return $this;
@@ -670,8 +684,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function deleteGroup($id, $field = 'code')
     {
-        $group = $this->groupFactory->create()->load($id,$field);
-        /* @var \Magento\Store\Model\Group $group **/
+        $group = $this->getGroup($id, $field);
 
         if (!$group->getId()) {
             throw new NoSuchEntityException(__('Invalid Group.'));
@@ -700,7 +713,7 @@ class StoreInstaller extends AbstractInstaller
         // Validate Already Exists
         $website = $this->getWebsite($data['code']);
         if ($website->getId()) {
-            throw new AlreadyExistsException(__('A Website with code: %s, already exists.', $data['code']));
+            throw new AlreadyExistsException(__('A Website with code: %1, already exists.', $data['code']));
         }
 
         return $this;
@@ -801,7 +814,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function deleteWebsite($id, $field = 'code')
     {
-        $website = $this->websiteFactory->create()->load($id,$field);
+        $website = $this->getWebsite($id,$field);
         /** @var \Magento\Store\Model\Website $website */
 
         if (!$website->getId()) {
@@ -831,7 +844,7 @@ class StoreInstaller extends AbstractInstaller
 
         // Validate Already Exists
         if ($this->getRootCategoryByName($data['name'])) {
-            throw new AlreadyExistsException(__('A Root Category with name: %s, already exists.', $data['name']));
+            throw new AlreadyExistsException(__('A Root Category with name: %1, already exists.', $data['name']));
         }
 
         return $this;
