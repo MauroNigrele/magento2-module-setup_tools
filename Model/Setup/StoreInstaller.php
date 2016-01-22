@@ -387,7 +387,7 @@ class StoreInstaller extends AbstractInstaller
     /*********************************************************************************************/
 
     /**
-     * @param array $neededKeys
+     * @param string[] $neededKeys
      * @param array $dataKeys
      * @param string $message
      * @return $this

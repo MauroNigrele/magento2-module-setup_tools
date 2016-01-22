@@ -37,8 +37,7 @@ class CatalogInstaller extends AbstractInstaller
         CategoryFactory $categoryFactory,
         //
         StoreInstaller $storeInstaller
-    )
-    {
+    ) {
         $this->storeInstaller = $storeInstaller;
         $this->categoryFactory = $categoryFactory;
         parent::__construct($objectManager, $registry, $logger, $config, $configWriter);
@@ -53,10 +52,10 @@ class CatalogInstaller extends AbstractInstaller
         'include_in_menu' => 1,
     );
 
-    public function createCategoryTree($storeCode, Array $categories)
+    public function createCategoryTree($storeCode, array $categories)
     {
         $store = $this->getStore($storeCode);
-        if(!$store->getId()) {
+        if (!$store->getId()) {
             $this->logger->warning(__('There is no Store with code: %1', $storeCode));
             return $this;
         }
@@ -66,9 +65,9 @@ class CatalogInstaller extends AbstractInstaller
         $this->addCategoryTreeChildren($rootCategory, $categories);
     }
 
-    public function addCategoryTreeChildren(Category $parentCategory, Array $children)
+    public function addCategoryTreeChildren(Category $parentCategory, array $children)
     {
-        foreach($children as $index => $categoryData) {
+        foreach ($children as $index => $categoryData) {
             // Prepare Data
             $category = $this->categoryFactory->create();
             /** @var \Magento\Catalog\Model\Category\ $category */
@@ -80,15 +79,15 @@ class CatalogInstaller extends AbstractInstaller
                 ->save();
 
             // Recursive
-            if(isset($categoryData['children']) && is_array($categoryData['children'])) {
+            if (isset($categoryData['children']) && is_array($categoryData['children'])) {
                 $this->addCategoryTreeChildren($category, $categoryData['children']);
             }
 
             // Store Names
-            if(isset($categoryData['store_name']) && is_array($categoryData['store_name'])) {
+            if (isset($categoryData['store_name']) && is_array($categoryData['store_name'])) {
                 foreach ($categoryData['store_name'] as $code => $name) {
                     $store = $this->getStore($code);
-                    if(!$store->getId()) {
+                    if (!$store->getId()) {
                         $this->logger->warning(__('There is no Store with code: %1', $code));
                         continue;
                     }
