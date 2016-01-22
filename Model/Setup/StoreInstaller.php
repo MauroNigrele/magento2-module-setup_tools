@@ -195,7 +195,7 @@ class StoreInstaller extends AbstractInstaller
      * @param array $configSchema
      * @return $this
      */
-    public function setConfigSchema(Array $configSchema)
+    public function setConfigSchema(array $configSchema)
     {
         // Default Config
         if (isset($configSchema['default']) && is_array($configSchema['default'])) {
@@ -239,7 +239,7 @@ class StoreInstaller extends AbstractInstaller
      * @param array $configSchema
      * @return $this
      */
-    public function setThemeConfigSchema(Array $configSchema)
+    public function setThemeConfigSchema(array $configSchema)
     {
         // Default Theme Config
         if (isset($configSchema['default'])) {
@@ -308,7 +308,7 @@ class StoreInstaller extends AbstractInstaller
      * @return $this
      * @throws NoSuchEntityException
      */
-    public function updateDefaultWebsiteSchema(Array $data)
+    public function updateDefaultWebsiteSchema(array $data)
     {
         // Load Defaults
         $defaultWebsite = $this->getDefaultWebsite();
@@ -393,7 +393,7 @@ class StoreInstaller extends AbstractInstaller
      * @return $this
      * @throws ValidatorException
      */
-    protected function validateKeys(Array $neededKeys, Array $dataKeys, $message = 'Invalid Keys')
+    protected function validateKeys(array $neededKeys, array $dataKeys, $message = 'Invalid Keys')
     {
         $errors = array();
         foreach ($neededKeys as $neededKey) {
@@ -417,7 +417,7 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewStoreData(Array $data)
+    protected function validateNewStoreData(array $data)
     {
         // Validate Data
         $this->validateKeys(array('name', 'code', 'group_id', 'website_id'), array_keys($data), 'New Store Validation Error: ');
@@ -454,7 +454,7 @@ class StoreInstaller extends AbstractInstaller
      * @param array $data
      * @return \Magento\Store\Model\Store
      */
-    public function createStore(Array $data)
+    public function createStore(array $data)
     {
         // Prepare & Validate Data
         $data = array_merge($this->defaultStoreData, $data);
@@ -481,7 +481,7 @@ class StoreInstaller extends AbstractInstaller
      * @return \Magento\Store\Model\Store
      * @throws NoSuchEntityException
      */
-    public function updateStore($id, Array $data, $field = 'code')
+    public function updateStore($id, array $data, $field = 'code')
     {
         $store = $this->getStore($id, $field);
 
@@ -529,7 +529,7 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewGroupData(Array $data)
+    protected function validateNewGroupData(array $data)
     {
         // Validate Data
         $this->validateKeys(array('name', 'website_id'), array_keys($data), 'New Store Group Validation Error: ');
@@ -568,7 +568,7 @@ class StoreInstaller extends AbstractInstaller
      * @param bool $processCategory
      * @return \Magento\Store\Model\Group
      */
-    public function createGroup(Array $data, $processStores = true, $processCategory = true)
+    public function createGroup(array $data, $processStores = true, $processCategory = true)
     {
         // Prepare & Validate Data
         $data = array_merge($this->defaultGroupData, $data);
@@ -626,7 +626,7 @@ class StoreInstaller extends AbstractInstaller
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function updateGroup($id, Array $data, $processStores = true, $processCategory = true, $field = 'name')
+    public function updateGroup($id, array $data, $processStores = true, $processCategory = true, $field = 'name')
     {
         $group = $this->getGroup($id, $field);
 
@@ -704,7 +704,7 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewWebsiteData(Array $data)
+    protected function validateNewWebsiteData(array $data)
     {
         // Validate Data
         $this->validateKeys(array('code', 'name'), array_keys($data), 'New Website Validation Error: ');
@@ -743,7 +743,7 @@ class StoreInstaller extends AbstractInstaller
      * @param bool $processGroups
      * @return \Magento\Store\Model\Website
      */
-    public function createWebsite(Array $data, $processGroups = true)
+    public function createWebsite(array $data, $processGroups = true)
     {
         // Prepare and Validate Data
         $data = array_merge($this->defaultWebsiteData, $data);
@@ -780,7 +780,7 @@ class StoreInstaller extends AbstractInstaller
      * @return \Magento\Store\Model\Website
      * @throws NoSuchEntityException
      */
-    public function updateWebsite($id, Array $data, $processGroups = true, $field = 'code')
+    public function updateWebsite($id, array $data, $processGroups = true, $field = 'code')
     {
         $website = $this->getWebsite($id, $field);
 
@@ -836,7 +836,7 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewRootCategoryData(Array $data)
+    protected function validateNewRootCategoryData(array $data)
     {
         // Validate Data
         $this->validateKeys(array('name', 'store_id'), array_keys($data), 'New Root Category Validation Error: ');
@@ -898,7 +898,7 @@ class StoreInstaller extends AbstractInstaller
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function updateRootCategory($id, Array $data)
+    public function updateRootCategory($id, array $data)
     {
         $category = $this->getRootCategory($id);
 
@@ -920,7 +920,7 @@ class StoreInstaller extends AbstractInstaller
      * @param array $data
      * @return \Magento\Catalog\Model\Category
      */
-    public function createRootCategory(Array $data)
+    public function createRootCategory(array $data)
     {
         $data = array_merge($this->defaultRootCategoryData, $data);
 
