@@ -50,8 +50,7 @@ abstract class AbstractInstaller
         LoggerInterface $logger,
         ScopeConfigInterface $config,
         WriterInterface $configWriter
-    )
-    {
+    ) {
         $this->objectManager = $objectManager;
         $this->registry = $registry;
         $this->logger = $logger;
@@ -67,7 +66,7 @@ abstract class AbstractInstaller
      */
     public function getConfig($path, $scopeType = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $scopeCode = null)
     {
-        return $this->configReader->getValue($path,$scopeType,$scopeCode);
+        return $this->configReader->getValue($path, $scopeType, $scopeCode);
     }
 
     /**
@@ -78,7 +77,7 @@ abstract class AbstractInstaller
      */
     public function getConfigFlag($path, $scopeType = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $scopeCode = null)
     {
-        return $this->configReader->isSetFlag($path,$scopeType,$scopeCode);
+        return $this->configReader->isSetFlag($path, $scopeType, $scopeCode);
     }
     
     /**
