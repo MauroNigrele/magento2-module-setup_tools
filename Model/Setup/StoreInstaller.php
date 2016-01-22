@@ -125,8 +125,7 @@ class StoreInstaller extends AbstractInstaller
         WebsiteFactory $websiteFactory,
         CategoryFactory $categoryFactory,
         ThemeFactory $themeFactory
-    )
-    {
+    ) {
         $this->storeManager = $storeManager;
         $this->storeFactory = $storeFactory;
         $this->groupFactory = $groupFactory;
