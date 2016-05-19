@@ -125,7 +125,8 @@ class StoreInstaller extends AbstractInstaller
         WebsiteFactory $websiteFactory,
         CategoryFactory $categoryFactory,
         ThemeFactory $themeFactory
-    ) {
+    )
+    {
         $this->storeManager = $storeManager;
         $this->storeFactory = $storeFactory;
         $this->groupFactory = $groupFactory;
@@ -195,38 +196,38 @@ class StoreInstaller extends AbstractInstaller
      * @param array $configSchema
      * @return $this
      */
-    public function setConfigSchema(array $configSchema)
+    public function setConfigSchema(Array $configSchema)
     {
         // Default Config
-        if (isset($configSchema['default']) && is_array($configSchema['default'])) {
-            foreach ($configSchema['default'] as $path => $value) {
+        if(isset($configSchema['default']) && is_array($configSchema['default'])) {
+            foreach($configSchema['default'] as $path => $value) {
                 $this->setConfig($path, $value);
             }
         }
         // Website Config
-        if (isset($configSchema['websites']) && is_array($configSchema['websites'])) {
-            foreach ($configSchema['websites'] as $code => $websiteConfig) {
+        if(isset($configSchema['websites']) && is_array($configSchema['websites'])) {
+            foreach($configSchema['websites'] as $code => $websiteConfig) {
                 $website = $this->getWebsite($code);
                 // Website Validation
-                if (!$website->getId()) {
+                if(!$website->getId()) {
                     $this->logger->warning(__('There is no Website with code: %1', $code));
                     continue;
                 }
-                foreach ($websiteConfig as $path => $value) {
+                foreach($websiteConfig as $path => $value) {
                     $this->setConfig($path, $value, 'websites', $website->getId());
                 }
             }
         }
         // Store Config
-        if (isset($configSchema['stores']) && is_array($configSchema['stores'])) {
-            foreach ($configSchema['stores'] as $code => $storeConfig) {
+        if(isset($configSchema['stores']) && is_array($configSchema['stores'])) {
+            foreach($configSchema['stores'] as $code => $storeConfig) {
                 $store = $this->getStore($code);
                 // Store Validation
-                if (!$store->getId()) {
+                if(!$store->getId()) {
                     $this->logger->warning(__('There is no Store with code: %1', $code));
                     continue;
                 }
-                foreach ($storeConfig as $path => $value) {
+                foreach($storeConfig as $path => $value) {
                     $this->setConfig($path, $value, 'stores', $store->getId());
                 }
             }
@@ -239,14 +240,14 @@ class StoreInstaller extends AbstractInstaller
      * @param array $configSchema
      * @return $this
      */
-    public function setThemeConfigSchema(array $configSchema)
+    public function setThemeConfigSchema(Array $configSchema)
     {
         // Default Theme Config
-        if (isset($configSchema['default'])) {
+        if (isset($configSchema['default'])){
             $theme = $this->themeFactory->create()->load($configSchema['default'], 'code');
             /** @var Theme $theme */
             // Theme Validation
-            if ($theme->getId()) {
+            if ($theme->getId()){
                 $this->setConfig('design/theme/theme_id', $theme->getId());
             } else {
                 $this->logger->warning(__('There is no Theme with code: %1', $configSchema['default']));
@@ -254,17 +255,17 @@ class StoreInstaller extends AbstractInstaller
         }
 
         // Website Theme Config
-        if (isset($configSchema['websites']) && is_array($configSchema['websites'])) {
-            foreach ($configSchema['websites'] as $code => $themeCode) {
+        if (isset($configSchema['websites']) && is_array($configSchema['websites'])){
+            foreach ($configSchema['websites'] as $code => $themeCode){
                 $website = $this->getWebsite($code);
                 $theme = $this->themeFactory->create()->load($themeCode, 'code');
                 // Website Validation
-                if (!$website->getId()) {
+                if (!$website->getId()){
                     $this->logger->warning(__('There is no Website with code: %1', $code));
                     continue;
                 }
                 // Theme Validation
-                if (!$theme->getId()) {
+                if (!$theme->getId()){
                     $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
                     continue;
                 }
@@ -274,17 +275,17 @@ class StoreInstaller extends AbstractInstaller
         }
 
         // Store Theme Config
-        if (isset($configSchema['stores']) && is_array($configSchema['stores'])) {
-            foreach ($configSchema['stores'] as $code => $themeCode) {
+        if (isset($configSchema['stores']) && is_array($configSchema['stores'])){
+            foreach ($configSchema['stores'] as $code => $themeCode){
                 $store = $this->getStore($code);
                 $theme = $this->themeFactory->create()->load($themeCode, 'code');
                 // Store Validation
-                if (!$store->getId()) {
+                if (!$store->getId()){
                     $this->logger->warning(__('There is no Store with code: %1', $code));
                     continue;
                 }
                 // Theme Validation
-                if (!$theme->getId()) {
+                if (!$theme->getId()){
                     $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
                     continue;
                 }
@@ -308,7 +309,7 @@ class StoreInstaller extends AbstractInstaller
      * @return $this
      * @throws NoSuchEntityException
      */
-    public function updateDefaultWebsiteSchema(array $data)
+    public function updateDefaultWebsiteSchema(Array $data)
     {
         // Load Defaults
         $defaultWebsite = $this->getDefaultWebsite();
@@ -316,31 +317,30 @@ class StoreInstaller extends AbstractInstaller
         $defaultStore = $this->getDefaultStore();
 
         // Update Default Website
-        $websiteData = $data;
-        unset($websiteData['_groups']);
-        $this->updateWebsite($defaultWebsite->getCode(), $websiteData);
+        $defaultWebsite->addData($data)
+            ->save();
 
         // Update / Create Groups
-        if (isset($data['_groups']) && is_array($data['_groups'])) {
-            foreach ($data['_groups'] as $groupData) {
+        if(isset($data['_groups']) && is_array($data['_groups'])) {
+            foreach($data['_groups'] as $groupData) {
 
                 // Append Data
                 $groupData['website_id'] = $defaultWebsite->getId();
 
                 // Default Group
-                if (isset($groupData['_is_default']) && $groupData['_is_default']) {
+                if(isset($groupData['_is_default']) && $groupData['_is_default']) {
 
                     // Update Default Group
                     $this->updateGroup($defaultGroup->getId(), $groupData, false, true, 'group_id');
 
                     // Update Stores
-                    if (isset($groupData['_stores']) && is_array($groupData['_stores'])) {
-                        foreach ($groupData['_stores'] as $storeData) {
+                    if(isset($groupData['_stores']) && is_array($groupData['_stores'])) {
+                        foreach($groupData['_stores'] as $storeData) {
                             // Append Data
                             $storeData['website_id'] = $defaultWebsite->getId();
                             $storeData['group_id'] = $defaultGroup->getId();
                             // Default Store
-                            if (isset($storeData['_is_default']) && $storeData['_is_default']) {
+                            if(isset($storeData['_is_default']) && $storeData['_is_default']) {
                                 // Update Default Store
                                 $this->updateStore($defaultStore->getId(), $storeData, 'store_id');
                             // Others
@@ -362,8 +362,8 @@ class StoreInstaller extends AbstractInstaller
                         $this->createGroup($groupData);
                     }
                     // Update Stores
-                    if (isset($groupData['_stores']) && is_array($groupData['_stores'])) {
-                        foreach ($groupData['_stores'] as $storeData) {
+                    if(isset($groupData['_stores']) && is_array($groupData['_stores'])) {
+                        foreach($groupData['_stores'] as $storeData) {
                             // Append Data
                             $storeData['website_id'] = $defaultWebsite->getId();
                             $storeData['group_id'] = $defaultGroup->getId();
@@ -387,22 +387,22 @@ class StoreInstaller extends AbstractInstaller
     /*********************************************************************************************/
 
     /**
-     * @param string[] $neededKeys
+     * @param array $neededKeys
      * @param array $dataKeys
      * @param string $message
      * @return $this
      * @throws ValidatorException
      */
-    protected function validateKeys(array $neededKeys, array $dataKeys, $message = 'Invalid Keys')
+    protected function validateKeys(Array $neededKeys,Array $dataKeys, $message = 'Invalid Keys')
     {
         $errors = array();
         foreach ($neededKeys as $neededKey) {
-            if (!in_array($neededKey, $dataKeys)) {
+            if(!in_array($neededKey, $dataKeys)) {
                 $errors[] = _('%1: is a needed field.', $neededKey);
             }
         }
         if (count($errors)) {
-            throw new ValidatorException(__($message . ' | ' . implode('/', $errors)));
+            throw new ValidatorException(__($message . ' | '  . implode('/', $errors)));
         }
         return $this;
     }
@@ -417,10 +417,10 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewStoreData(array $data)
+    protected function validateNewStoreData(Array $data)
     {
         // Validate Data
-        $this->validateKeys(array('name', 'code', 'group_id', 'website_id'), array_keys($data), 'New Store Validation Error: ');
+        $this->validateKeys(array('name','code','group_id','website_id'), array_keys($data), 'New Store Validation Error: ');
 
         // Validate Already Exists
         $store = $this->getStore($data['code']);
@@ -446,7 +446,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function getStore($id, $field = 'code')
     {
-        $store = $this->storeFactory->create()->load($id, $field);
+        $store = $this->storeFactory->create()->load($id,$field);
         return $store;
     }
 
@@ -454,7 +454,7 @@ class StoreInstaller extends AbstractInstaller
      * @param array $data
      * @return \Magento\Store\Model\Store
      */
-    public function createStore(array $data)
+    public function createStore(Array $data)
     {
         // Prepare & Validate Data
         $data = array_merge($this->defaultStoreData, $data);
@@ -468,7 +468,7 @@ class StoreInstaller extends AbstractInstaller
             ->save();
 
         // Default Store
-        if (isset($data['_is_default']) && $data['_is_default']) {
+        if(isset($data['_is_default']) && $data['_is_default']){
             $store->getGroup()->setDefaultStoreId($store->getId())->save();
         }
         return $store;
@@ -481,9 +481,9 @@ class StoreInstaller extends AbstractInstaller
      * @return \Magento\Store\Model\Store
      * @throws NoSuchEntityException
      */
-    public function updateStore($id, array $data, $field = 'code')
+    public function updateStore($id,Array $data, $field = 'code')
     {
-        $store = $this->getStore($id, $field);
+        $store = $this->getStore($id,$field);
 
         if (!$store->getId()) {
             throw new NoSuchEntityException(__('Invalid Store.'));
@@ -493,7 +493,7 @@ class StoreInstaller extends AbstractInstaller
             ->save();
 
         // Default Store
-        if (isset($data['_is_default']) && $data['_is_default']) {
+        if(isset($data['_is_default']) && $data['_is_default']){
             $store->getGroup()->setDefaultStoreId($store->getId())->save();
         }
 
@@ -508,7 +508,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function deleteStore($id, $field = 'code')
     {
-        $store = $this->getStore($id, $field);
+        $store = $this->getStore($id,$field);
         /* @var \Magento\Store\Model\Store $store **/
 
         if (!$store->getId()) {
@@ -529,10 +529,10 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewGroupData(array $data)
+    protected function validateNewGroupData(Array $data)
     {
         // Validate Data
-        $this->validateKeys(array('name', 'website_id'), array_keys($data), 'New Store Group Validation Error: ');
+        $this->validateKeys(array('name','website_id'), array_keys($data), 'New Store Group Validation Error: ');
 
         // Validate Already Exists
         $group = $this->getGroup($data['name']);
@@ -558,7 +558,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function getGroup($id, $field = 'name')
     {
-        $group = $this->groupFactory->create()->load($id, $field);
+        $group = $this->groupFactory->create()->load($id,$field);
         return $group;
     }
 
@@ -568,7 +568,7 @@ class StoreInstaller extends AbstractInstaller
      * @param bool $processCategory
      * @return \Magento\Store\Model\Group
      */
-    public function createGroup(array $data, $processStores = true, $processCategory = true)
+    public function createGroup(Array $data, $processStores = true, $processCategory = true)
     {
         // Prepare & Validate Data
         $data = array_merge($this->defaultGroupData, $data);
@@ -583,8 +583,8 @@ class StoreInstaller extends AbstractInstaller
             ->save();
 
         // Create/Update Stores
-        if ($processStores && isset($data['_stores']) && is_array($data['_stores'])) {
-            foreach ($data['_stores'] as $storeData) {
+        if($processStores && isset($data['_stores']) && is_array($data['_stores'])) {
+            foreach($data['_stores'] as $storeData) {
                 $storeData['group_id'] = $group->getId();
                 $storeData['website_id'] = $group->getWebsiteId();
                 try {
@@ -596,12 +596,12 @@ class StoreInstaller extends AbstractInstaller
         }
 
         // Default Group
-        if (isset($data['_is_default']) && $data['_is_default']) {
+        if(isset($data['_is_default']) && $data['_is_default']) {
             $group->getWebsite()->setDefaultGroupId($group->getId())->save();
         }
 
         // Root Category
-        if ($processCategory && isset($data['_root_category'])) {
+        if($processCategory && isset($data['_root_category'])) {
 
             try {
                 $rootCategory = $this->createRootCategory($data['_root_category']);
@@ -626,9 +626,9 @@ class StoreInstaller extends AbstractInstaller
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function updateGroup($id, array $data, $processStores = true, $processCategory = true, $field = 'name')
+    public function updateGroup($id,Array $data, $processStores = true, $processCategory = true, $field = 'name')
     {
-        $group = $this->getGroup($id, $field);
+        $group = $this->getGroup($id,$field);
 
         if (!$group->getId()) {
             throw new NoSuchEntityException(__('Invalid Group.'));
@@ -638,8 +638,8 @@ class StoreInstaller extends AbstractInstaller
             ->save();
 
         // Update/Create Stores
-        if ($processStores && isset($data['_stores']) && is_array($data['_stores'])) {
-            foreach ($data['_stores'] as $storeData) {
+        if($processStores && isset($data['_stores']) && is_array($data['_stores'])) {
+            foreach($data['_stores'] as $storeData) {
                 $storeData['group_id'] = $group->getId();
                 $storeData['website_id'] = $group->getWebsiteId();
                 try {
@@ -651,22 +651,22 @@ class StoreInstaller extends AbstractInstaller
         }
 
         // Default Group
-        if (isset($data['_is_default']) && $data['_is_default']) {
+        if(isset($data['_is_default']) && $data['_is_default']) {
             $group->getWebsite()->setDefaultGroupId($group->getId())->save();
         }
 
         // Root Category
-        if ($processCategory && isset($data['_root_category'])) {
+        if($processCategory && isset($data['_root_category'])) {
             // Check Rename Action
-            if (isset($data['_root_category']['_rename']) && $data['_root_category']['_rename']) {
+            if(isset($data['_root_category']['_rename']) && $data['_root_category']['_rename']) {
                 $this->updateRootCategory($group->getRootCategoryId(), $data['_root_category']);
             } else {
                 // Load Category
                 $rootCategory = $this->getRootCategoryByName($data['_root_category']['name']);
-                if (null === $rootCategory) {
+                if(null === $rootCategory) {
                     $rootCategory = $this->createRootCategory($data['_root_category']);
                 }
-                if ($rootCategory->getId() != $group->getRootCategoryId()) {
+                if($rootCategory->getId() != $group->getRootCategoryId()) {
                     $group->setRootCategoryId($rootCategory->getId());
                 }
             }
@@ -704,10 +704,10 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewWebsiteData(array $data)
+    protected function validateNewWebsiteData(Array $data)
     {
         // Validate Data
-        $this->validateKeys(array('code', 'name'), array_keys($data), 'New Website Validation Error: ');
+        $this->validateKeys(array('code','name'), array_keys($data), 'New Website Validation Error: ');
 
         // Validate Already Exists
         $website = $this->getWebsite($data['code']);
@@ -733,7 +733,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function getWebsite($id, $field = 'code')
     {
-        $website = $this->websiteFactory->create()->load($id, $field);
+        $website = $this->websiteFactory->create()->load($id,$field);
         /** @var \Magento\Store\Model\Website $website */
         return $website;
     }
@@ -743,7 +743,7 @@ class StoreInstaller extends AbstractInstaller
      * @param bool $processGroups
      * @return \Magento\Store\Model\Website
      */
-    public function createWebsite(array $data, $processGroups = true)
+    public function createWebsite(Array $data, $processGroups = true)
     {
         // Prepare and Validate Data
         $data = array_merge($this->defaultWebsiteData, $data);
@@ -757,14 +757,14 @@ class StoreInstaller extends AbstractInstaller
             ->save();
 
         // Create/Update Groups
-        if ($processGroups && isset($data['_groups']) && is_array($data['_groups'])) {
-            foreach ($data['_groups'] as $groupKey => $groupData) {
+        if($processGroups && isset($data['_groups']) && is_array($data['_groups'])) {
+            foreach($data['_groups'] as $groupKey => $groupData) {
                 $groupData['website_id'] = $website->getId();
                 $this->createGroup($groupData);
                 try {
                     $this->createGroup($groupData);
                 } catch (AlreadyExistsException $e) {
-                    $this->updateGroup($groupData['name'], $groupData);
+                    $this->updateGroup($groupData['name'],$groupData);
                 }
             }
         }
@@ -780,7 +780,7 @@ class StoreInstaller extends AbstractInstaller
      * @return \Magento\Store\Model\Website
      * @throws NoSuchEntityException
      */
-    public function updateWebsite($id, array $data, $processGroups = true, $field = 'code')
+    public function updateWebsite($id,Array $data, $processGroups = true, $field = 'code')
     {
         $website = $this->getWebsite($id, $field);
 
@@ -788,12 +788,15 @@ class StoreInstaller extends AbstractInstaller
             throw new NoSuchEntityException(__('Invalid Website.'));
         }
 
+//        $websiteData = $data;
+//        unset($websiteData['_groups']);
+
         $website->addData($data)
             ->save();
 
         // Update/Create Groups
-        if ($processGroups && isset($data['_groups']) && is_array($data['_groups'])) {
-            foreach ($data['_groups'] as $groupData) {
+        if($processGroups && isset($data['_groups']) && is_array($data['_groups'])) {
+            foreach($data['_groups'] as $groupData) {
                 $groupData['website_id'] = $website->getWebsiteId();
                 try {
                     $this->updateGroup($groupData['name'], $groupData);
@@ -813,7 +816,7 @@ class StoreInstaller extends AbstractInstaller
      */
     public function deleteWebsite($id, $field = 'code')
     {
-        $website = $this->getWebsite($id, $field);
+        $website = $this->getWebsite($id,$field);
         /** @var \Magento\Store\Model\Website $website */
 
         if (!$website->getId()) {
@@ -836,10 +839,10 @@ class StoreInstaller extends AbstractInstaller
      * @throws AlreadyExistsException
      * @throws ValidatorException
      */
-    protected function validateNewRootCategoryData(array $data)
+    protected function validateNewRootCategoryData(Array $data)
     {
         // Validate Data
-        $this->validateKeys(array('name', 'store_id'), array_keys($data), 'New Root Category Validation Error: ');
+        $this->validateKeys(array('name','store_id'), array_keys($data), 'New Root Category Validation Error: ');
 
         // Validate Already Exists
         if ($this->getRootCategoryByName($data['name'])) {
@@ -883,7 +886,7 @@ class StoreInstaller extends AbstractInstaller
         $collection->addAttributeToFilter('name', array('eq' => $name))
             ->addLevelFilter(1);
 
-        if ($collection->count()) {
+        if($collection->count()) {
             return $collection->getFirstItem();
         }
 
@@ -898,7 +901,7 @@ class StoreInstaller extends AbstractInstaller
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function updateRootCategory($id, array $data)
+    public function updateRootCategory($id,Array $data)
     {
         $category = $this->getRootCategory($id);
 
@@ -920,7 +923,7 @@ class StoreInstaller extends AbstractInstaller
      * @param array $data
      * @return \Magento\Catalog\Model\Category
      */
-    public function createRootCategory(array $data)
+    public function createRootCategory(Array $data)
     {
         $data = array_merge($this->defaultRootCategoryData, $data);
 
@@ -940,7 +943,7 @@ class StoreInstaller extends AbstractInstaller
      */
     protected function getTreeRootCategory()
     {
-        if (!$this->treeRootCategory) {
+        if(!$this->treeRootCategory) {
             $this->treeRootCategory = $this->categoryFactory->create()
                 ->load(Category::TREE_ROOT_ID);
         }

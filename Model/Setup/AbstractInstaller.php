@@ -2,11 +2,14 @@
 
 namespace MauroNigrele\SetupTools\Model\Setup;
 
-use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
+
+use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 abstract class AbstractInstaller
 {
@@ -37,6 +40,16 @@ abstract class AbstractInstaller
     protected $configWriter;
 
     /**
+     * @var \Magento\Framework\Setup\ModuleDataSetupInterface
+     */
+    protected $moduleDataSetup;
+
+    /**
+     * @var \Magento\Eav\Setup\EavSetup
+     */
+    protected $eavSetup;
+
+    /**
      * AbstractInstaller constructor.
      * @param ObjectManagerInterface $objectManager
      * @param Registry $registry
@@ -50,7 +63,8 @@ abstract class AbstractInstaller
         LoggerInterface $logger,
         ScopeConfigInterface $config,
         WriterInterface $configWriter
-    ) {
+    )
+    {
         $this->objectManager = $objectManager;
         $this->registry = $registry;
         $this->logger = $logger;
@@ -66,7 +80,7 @@ abstract class AbstractInstaller
      */
     public function getConfig($path, $scopeType = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $scopeCode = null)
     {
-        return $this->configReader->getValue($path, $scopeType, $scopeCode);
+        return $this->configReader->getValue($path,$scopeType,$scopeCode);
     }
 
     /**
@@ -77,7 +91,7 @@ abstract class AbstractInstaller
      */
     public function getConfigFlag($path, $scopeType = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $scopeCode = null)
     {
-        return $this->configReader->isSetFlag($path, $scopeType, $scopeCode);
+        return $this->configReader->isSetFlag($path,$scopeType,$scopeCode);
     }
     
     /**
@@ -91,6 +105,41 @@ abstract class AbstractInstaller
     {
         $this->configWriter->save($path, $value, $scope, $scopeId);
         return $this;
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     * @return $this
+     */
+    public function setModuleDataSetup(ModuleDataSetupInterface $setup)
+    {
+        $this->moduleDataSetup = $setup;
+        return $this;
+    }
+
+    /**
+     * @return ModuleDataSetupInterface
+     */
+    public function getModuleDataSetup()
+    {
+        return $this->moduleDataSetup;
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     * @return \Magento\Eav\Setup\EavSetup
+     * @throws LocalizedException
+     */
+    public function getEavSetup(ModuleDataSetupInterface $setup = null)
+    {
+        $setup = $setup ?: $this->moduleDataSetup;
+        if(!$setup){
+            throw  new LocalizedException(__('Module Setup Resource is not defined. Please execute setModuleSetup() before this.'));
+        }
+        if(!$this->eavSetup) {
+            $this->eavSetup = $this->objectManager->create('\Magento\Eav\Setup\EavSetup',['setup' => $setup]);
+        }
+        return $this->eavSetup;
     }
 
 }

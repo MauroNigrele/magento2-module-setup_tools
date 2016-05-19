@@ -7,8 +7,7 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
-//use Magento\Framework\Setup\ModuleContextInterface;
-//use Magento\Framework\Setup\SetupInterface;
+use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Psr\Log\LoggerInterface;
 
 
@@ -27,6 +26,11 @@ class Installer extends AbstractInstaller
     protected $catalogInstaller;
 
     /**
+     * @var CmsInstaller
+     */
+    protected $cmsInstaller;
+
+    /**
      * @var CustomerInstaller
      */
     protected $customerInstaller;
@@ -36,24 +40,42 @@ class Installer extends AbstractInstaller
      */
     protected $salesInstaller;
 
+    /**
+     * Installer constructor.
+     * @param ObjectManagerInterface $objectManager
+     * @param Registry $registry
+     * @param LoggerInterface $logger
+     * @param ScopeConfigInterface $config
+     * @param WriterInterface $configWriter
+     * @param CatalogInstaller $catalogInstaller
+     * @param CmsInstaller $cmsInstaller
+     * @param CustomerInstaller $customerInstaller
+     * @param SalesInstaller $salesInstaller
+     * @param StoreInstaller $storeInstaller
+     */
     public function __construct(
+        // Abstract Installer
         ObjectManagerInterface $objectManager,
         Registry $registry,
         LoggerInterface $logger,
         ScopeConfigInterface $config,
+        //
         WriterInterface $configWriter,
         CatalogInstaller $catalogInstaller,
+        CmsInstaller $cmsInstaller,
         CustomerInstaller $customerInstaller,
         SalesInstaller $salesInstaller,
         StoreInstaller $storeInstaller
-    ) {
+    )
+    {
         // Installers
         $this->storeInstaller = $storeInstaller;
         $this->catalogInstaller = $catalogInstaller;
+        $this->cmsInstaller = $cmsInstaller;
         $this->salesInstaller = $salesInstaller;
         $this->customerInstaller = $customerInstaller;
         // Parent
-        parent::__construct($objectManager, $registry, $logger, $config, $configWriter);
+        parent::__construct($objectManager,$registry,$logger,$config,$configWriter);
     }
 
     protected function allowRemoveAction()
@@ -63,13 +85,19 @@ class Installer extends AbstractInstaller
         return $this;
     }
 
-//    protected function init(SetupInterface $setup, ModuleContextInterface $moduleContext)
-//    {
-//        // @todo Set Setup to EAV Installers
-//
-//        $this->isInitialized = true;
-//        return $this;
-//    }
+    /**
+     * @param ModuleDataSetupInterface $setup
+     * @return $this
+     */
+    public function setModuleDataSetup(ModuleDataSetupInterface $setup)
+    {
+        parent::setModuleDataSetup($setup);
+        $this->getCatalogInstaller()->setModuleDataSetup($setup);
+        $this->getCustomerInstaller()->setModuleDataSetup($setup);
+        $this->getStoreInstaller()->setModuleDataSetup($setup);
+        $this->getSalesInstaller()->setModuleDataSetup($setup);
+        return $this;
+    }
 
     /*********************************************************************************************/
     /******************************************************************************* INSTALLERS **/
@@ -90,6 +118,15 @@ class Installer extends AbstractInstaller
     {
         // Validate Init
         return $this->catalogInstaller;
+    }
+
+    /**
+     * @return CmsInstaller
+     */
+    public function getCmsInstaller()
+    {
+        // Validate Init
+        return $this->cmsInstaller;
     }
 
     /**
@@ -114,6 +151,7 @@ class Installer extends AbstractInstaller
     /********************************************************************************** OBJECTS **/
     /*********************************************************************************************/
 
+
     /**
      * @param $object
      * @param bool $removeBaseMethods
@@ -124,7 +162,7 @@ class Installer extends AbstractInstaller
         $class = get_class($object);
         $methods = get_class_methods($object);
         sort($methods);
-        if ($object instanceof DataObject && $removeBaseMethods) {
+        if($object instanceof DataObject && $removeBaseMethods) {
             $baseMethods = get_class_methods($this->objectManager->create('Magento\Framework\DataObject'));
             foreach ($methods as $k => $v) {
                 if (in_array($v, $baseMethods)) {
