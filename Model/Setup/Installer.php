@@ -64,7 +64,7 @@ class Installer extends AbstractInstaller
         CustomerInstaller $customerInstaller,
         SalesInstaller $salesInstaller,
         StoreInstaller $storeInstaller
-    ){
+    ) {
         // Installers
         $this->storeInstaller = $storeInstaller;
         $this->catalogInstaller = $catalogInstaller;
@@ -168,8 +168,8 @@ class Installer extends AbstractInstaller
             }
         }
 
-        $this->logger->info(":: " . $class . " :: ");
-        $this->logger->info(print_r($methods, true) . "\n");
+        $this->logger->info(":: ".$class." :: ");
+        $this->logger->info(print_r($methods, true)."\n");
 
         return $this;
     }

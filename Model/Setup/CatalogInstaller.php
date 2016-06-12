@@ -86,7 +86,7 @@ class CatalogInstaller extends EavInstaller
         CategoryFactory $categoryFactory,
         Collection\Factory $categoryCollectionFactory,
         StoreInstaller $storeInstaller
-    ){
+    ) {
         $this->categoryFactory = $categoryFactory;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->storeInstaller = $storeInstaller;
@@ -108,7 +108,7 @@ class CatalogInstaller extends EavInstaller
     }
 
     /**
-     * @return int|null
+     * @return integer
      */
     protected function getDefaultProductAttributeSetId()
     {
@@ -125,7 +125,7 @@ class CatalogInstaller extends EavInstaller
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return \Magento\Eav\Model\Entity\Attribute\Set
      */
     public function getProductAttributeSet($name)
@@ -179,7 +179,7 @@ class CatalogInstaller extends EavInstaller
 
     /**
      * @param $id
-     * @return $this|\Magento\Framework\DataObject|null
+     * @return \Magento\Framework\DataObject|null
      * @throws LocalizedException
      */
     public function getProductAttribute($id)
@@ -272,7 +272,7 @@ class CatalogInstaller extends EavInstaller
 
     /**
      * @param $id
-     * @return $this|\Magento\Framework\DataObject|null
+     * @return \Magento\Framework\DataObject|null
      * @throws LocalizedException
      */
     public function getCategoryAttribute($id)
@@ -448,7 +448,7 @@ class CatalogInstaller extends EavInstaller
             $collection->addFieldToFilter($field, $condition);
         }
         $collection->getConnection()->query(
-            $collection->getConnection()->deleteFromSelect($collection->getSelect(),'main_table')
+            $collection->getConnection()->deleteFromSelect($collection->getSelect(), 'main_table')
         );
         return $this;
     }
