@@ -64,8 +64,7 @@ class Installer extends AbstractInstaller
         CustomerInstaller $customerInstaller,
         SalesInstaller $salesInstaller,
         StoreInstaller $storeInstaller
-    )
-    {
+    ){
         // Installers
         $this->storeInstaller = $storeInstaller;
         $this->catalogInstaller = $catalogInstaller;
@@ -73,7 +72,7 @@ class Installer extends AbstractInstaller
         $this->salesInstaller = $salesInstaller;
         $this->customerInstaller = $customerInstaller;
         // Parent
-        parent::__construct($objectManager,$registry,$logger,$config,$configWriter);
+        parent::__construct($objectManager, $registry, $logger, $config, $configWriter);
     }
 
     protected function allowRemoveAction()
@@ -160,7 +159,7 @@ class Installer extends AbstractInstaller
         $class = get_class($object);
         $methods = get_class_methods($object);
         sort($methods);
-        if($object instanceof DataObject && $removeBaseMethods) {
+        if ($object instanceof DataObject && $removeBaseMethods) {
             $baseMethods = get_class_methods($this->objectManager->create('Magento\Framework\DataObject'));
             foreach ($methods as $k => $v) {
                 if (in_array($v, $baseMethods)) {

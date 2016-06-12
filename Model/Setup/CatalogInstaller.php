@@ -48,10 +48,10 @@ class CatalogInstaller extends EavInstaller
      * @var array
      */
     protected $categorySkeleton = [
-        'position'      => 1,
-        'is_active'     => 1,
-        'store_id'      => 0,
-        'display_mode'  => Category::DM_PRODUCT,
+        'position' => 1,
+        'is_active' => 1,
+        'store_id' => 0,
+        'display_mode' => Category::DM_PRODUCT,
         'include_in_menu' => 1,
     ];
 
@@ -86,8 +86,7 @@ class CatalogInstaller extends EavInstaller
         CategoryFactory $categoryFactory,
         Collection\Factory $categoryCollectionFactory,
         StoreInstaller $storeInstaller
-    )
-    {
+    ){
         $this->categoryFactory = $categoryFactory;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->storeInstaller = $storeInstaller;
@@ -143,7 +142,7 @@ class CatalogInstaller extends EavInstaller
     public function addProductAttributeSet($name, $skeletonSetId = null)
     {
         // Validate Name
-        if($set = $this->getProductAttributeSet($name)) {
+        if ($set = $this->getProductAttributeSet($name)) {
             $this->logger->notice(__('Attribute Set creation skipped for set: %1', $name));
             return $set;
         }
@@ -152,7 +151,7 @@ class CatalogInstaller extends EavInstaller
             ->setEntityTypeId($this->getEavSetup()->getEntityTypeId($this->getProductEntityType()))
             ->setAttributeSetName(trim($name));
 
-        if(!$set->validate()) {
+        if (!$set->validate()) {
             throw new LocalizedException('Invalid Attribute Set data, please check the attribute set data.');
         }
 
@@ -209,7 +208,7 @@ class CatalogInstaller extends EavInstaller
     public function removeProductAttribute($code)
     {
         $this->getEavSetup()
-            ->removeAttribute($this->getProductEntityType(),$code);
+            ->removeAttribute($this->getProductEntityType(), $code);
         return $this;
     }
 
@@ -222,7 +221,7 @@ class CatalogInstaller extends EavInstaller
     public function addProductAttribute($code, $data)
     {
         $this->getEavSetup()
-            ->addAttribute($this->getProductEntityType(),$code,$data);
+            ->addAttribute($this->getProductEntityType(), $code, $data);
         return $this;
     }
 
@@ -232,7 +231,7 @@ class CatalogInstaller extends EavInstaller
      */
     public function addProductAttributes($attributes)
     {
-        foreach($attributes as $code => $data){
+        foreach ($attributes as $code => $data) {
             $this->addProductAttribute($code, $data);
         }
         return $this;
@@ -249,7 +248,7 @@ class CatalogInstaller extends EavInstaller
     public function addProductAttributeToGroup($setId, $groupId, $attributeId, $sortOrder = null)
     {
         $this->getEavSetup()
-            ->addAttributeToGroup($this->getProductEntityType(),$setId,$groupId,$attributeId,$sortOrder);
+            ->addAttributeToGroup($this->getProductEntityType(), $setId, $groupId, $attributeId, $sortOrder);
         return $this;
     }
 
@@ -289,7 +288,7 @@ class CatalogInstaller extends EavInstaller
     public function removeCategoryAttribute($code)
     {
         $this->getEavSetup()
-            ->removeAttribute($this->getCategoryEntityType(),$code);
+            ->removeAttribute($this->getCategoryEntityType(), $code);
         return $this;
     }
 
@@ -302,7 +301,7 @@ class CatalogInstaller extends EavInstaller
     public function addCategoryAttribute($code, $data)
     {
         $this->getEavSetup()
-            ->addAttribute($this->getCategoryEntityType(),$code,$data);
+            ->addAttribute($this->getCategoryEntityType(), $code, $data);
         return $this;
     }
 
@@ -312,7 +311,7 @@ class CatalogInstaller extends EavInstaller
      */
     public function addCategoryAttributes($attributes)
     {
-        foreach($attributes as $code => $data){
+        foreach ($attributes as $code => $data) {
             $this->addCategoryAttribute($code, $data);
         }
         return $this;
@@ -330,7 +329,7 @@ class CatalogInstaller extends EavInstaller
     public function createCategoryTree($storeCode, Array $categories)
     {
         $store = $this->getStore($storeCode);
-        if(!$store->getId()) {
+        if (!$store->getId()) {
             $this->logger->warning(__('There is no Store with code: %1', $storeCode));
             return $this;
         }
@@ -348,7 +347,7 @@ class CatalogInstaller extends EavInstaller
      */
     public function addCategoryTreeChildren(Category $parentCategory, Array $children)
     {
-        foreach($children as $index => $categoryData) {
+        foreach ($children as $index => $categoryData) {
             // Prepare Data
             $category = $this->categoryFactory->create();
             /** @var \Magento\Catalog\Model\Category\ $category */
@@ -362,15 +361,15 @@ class CatalogInstaller extends EavInstaller
                 ->save();
 
             // Recursive
-            if(isset($categoryData['children']) && is_array($categoryData['children'])) {
+            if (isset($categoryData['children']) && is_array($categoryData['children'])) {
                 $this->addCategoryTreeChildren($category, $categoryData['children']);
             }
 
             // Store Names
-            if(isset($categoryData['store_name']) && is_array($categoryData['store_name'])) {
+            if (isset($categoryData['store_name']) && is_array($categoryData['store_name'])) {
                 foreach ($categoryData['store_name'] as $code => $name) {
                     $store = $this->getStore($code);
-                    if(!$store->getId()) {
+                    if (!$store->getId()) {
                         $this->logger->warning(__('There is no Store with code: %1', $code));
                         continue;
                     }
@@ -438,15 +437,15 @@ class CatalogInstaller extends EavInstaller
      */
     public function cleanUrlRewrites($filters = [])
     {
-        if(!count($filters)) {
+        if (!count($filters)) {
             $this->logger->alert(__('Process cleanUrlRewrites skipped, no filters received.'));
             return $this;
         }
         $collection = $this->objectManager
             ->get('Magento\UrlRewrite\Model\ResourceModel\UrlRewriteCollection');
         /* @var \Magento\UrlRewrite\Model\ResourceModel\UrlRewriteCollection $collection */
-        foreach($filters as $field => $condition) {
-            $collection->addFieldToFilter($field,$condition);
+        foreach ($filters as $field => $condition) {
+            $collection->addFieldToFilter($field, $condition);
         }
         $collection->getConnection()->query(
             $collection->getConnection()->deleteFromSelect($collection->getSelectSql(), 'main_table')
