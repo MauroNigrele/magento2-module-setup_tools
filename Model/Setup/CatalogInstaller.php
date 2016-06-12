@@ -152,7 +152,7 @@ class CatalogInstaller extends EavInstaller
             ->setAttributeSetName(trim($name));
 
         if (!$set->validate()) {
-            throw new LocalizedException('Invalid Attribute Set data, please check the attribute set data.');
+            throw new LocalizedException(__('Invalid Attribute Set data, please check the attribute set data.'));
         }
 
         $set->save();
@@ -448,7 +448,7 @@ class CatalogInstaller extends EavInstaller
             $collection->addFieldToFilter($field, $condition);
         }
         $collection->getConnection()->query(
-            $collection->getConnection()->deleteFromSelect($collection->getSelectSql(), 'main_table')
+            $collection->getConnection()->deleteFromSelect($collection->getSelect(),'main_table')
         );
         return $this;
     }
