@@ -50,7 +50,7 @@ class EavInstaller extends AbstractInstaller
         SetFactory $attributeSetFactory,
         GroupFactory $attributeGroupFactory,
         AttributeFactory $attributeFactory
-    ){
+    ) {
         // Eav Installer
         $this->attributeSetFactory = $attributeSetFactory;
         $this->attributeGroupFactory = $attributeGroupFactory;
@@ -128,7 +128,7 @@ class EavInstaller extends AbstractInstaller
      *
      * @param int|string $id
      * @param int|null $setId
-     * @return \Magento\Eav\Model\Entity\Attribute\Group|null
+     * @return \Magento\Framework\DataObject|null
      * @throws LocalizedException
      */
     public function getAttributeGroup($id, $setId = null)
@@ -191,7 +191,7 @@ class EavInstaller extends AbstractInstaller
     /**
      * @param $id
      * @param null $entityTypeId
-     * @return $this|\Magento\Framework\DataObject|null
+     * @return \Magento\Framework\DataObject|null
      * @throws LocalizedException
      */
     public function getAttribute($id, $entityTypeId = null)

@@ -63,7 +63,7 @@ abstract class AbstractInstaller
         LoggerInterface $logger,
         ScopeConfigInterface $config,
         WriterInterface $configWriter
-    ){
+    ) {
         $this->objectManager = $objectManager;
         $this->registry = $registry;
         $this->logger = $logger;

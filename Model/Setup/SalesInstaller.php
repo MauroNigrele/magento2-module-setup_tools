@@ -16,7 +16,7 @@ class SalesInstaller extends AbstractInstaller
         LoggerInterface $logger,
         ScopeConfigInterface $config,
         WriterInterface $configWriter
-    ){
+    ) {
         parent::__construct($objectManager, $registry, $logger, $config, $configWriter);
     }
 }
