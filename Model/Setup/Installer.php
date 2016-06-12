@@ -144,33 +144,4 @@ class Installer extends AbstractInstaller
         return $this->salesInstaller;
     }
 
-    /*********************************************************************************************/
-    /********************************************************************************** OBJECTS **/
-    /*********************************************************************************************/
-
-
-    /**
-     * @param $object
-     * @param bool $removeBaseMethods
-     * @return $this
-     */
-    public function debugObject($object, $removeBaseMethods = true)
-    {
-        $class = get_class($object);
-        $methods = get_class_methods($object);
-        sort($methods);
-        if ($object instanceof DataObject && $removeBaseMethods) {
-            $baseMethods = get_class_methods($this->objectManager->create('Magento\Framework\DataObject'));
-            foreach ($methods as $k => $v) {
-                if (in_array($v, $baseMethods)) {
-                    unset($methods[$k]);
-                }
-            }
-        }
-
-        $this->logger->info(":: " . $class . " :: ");
-        $this->logger->info(print_r($methods, true) . "\n");
-
-        return $this;
-    }
 }
