@@ -23,7 +23,7 @@ use Magento\Framework\Exception\LocalizedException;
 
 class EavInstaller extends AbstractInstaller
 {
-
+    
     /**
      * @var SetFactory
      */

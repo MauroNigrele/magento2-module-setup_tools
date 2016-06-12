@@ -25,9 +25,18 @@ use Magento\Theme\Model\ThemeFactory;
 
 use Psr\Log\LoggerInterface;
 
-
+/**
+ * Class StoreInstaller
+ * @package MauroNigrele\SetupTools\Model\Setup
+ *
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class StoreInstaller extends AbstractInstaller
 {
+    
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
@@ -248,15 +257,22 @@ class StoreInstaller extends AbstractInstaller
             foreach ($storeConfig as $path => $value) {
                 // Eval Custom Configuration
                 if ($path[0] === '_') {
-                    $this->setCustomConfig($path, $value, 'stores', $website->getId());
+                    $this->setCustomConfig($path, $value, 'stores', $store->getId());
                     continue;
                 }
-                $this->setConfig($path, $value, 'stores', $website->getId());
+                $this->setConfig($path, $value, 'stores', $store->getId());
             }
         }
         return $this;
     }
 
+    /**
+     * @param $path
+     * @param $value
+     * @param string $scopeType
+     * @param int $scopeCode
+     * @return $this
+     */
     public function setCustomConfig($path, $value, $scopeType = 'default', $scopeCode = 0)
     {
         switch ($path) {
