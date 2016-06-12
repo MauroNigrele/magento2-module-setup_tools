@@ -113,7 +113,7 @@ class CmsInstaller extends AbstractInstaller
     }
 
     /**
-     * @return StoreFactory
+     * @return PageFactory
      */
     public function getPageFactory()
     {
@@ -152,11 +152,17 @@ class CmsInstaller extends AbstractInstaller
         return $this->getBlockFactory()->create();
     }
 
+    /**
+     * @return bool
+     */
     public function getIsStrictMode()
     {
         return $this->isStrictMode;
     }
 
+    /**
+     * @param $value
+     */
     public function setIsStrictMode($value)
     {
         $this->isStrictMode = (bool)$value;
@@ -190,7 +196,8 @@ class CmsInstaller extends AbstractInstaller
     public function createPage($id, $content, $storeIds = null, $params = [])
     {
         // Validate Already Exists
-        if($page = $this->getPage($id, $storeIds)) {
+        $page = $this->getPage($id, $storeIds);
+        if($page) {
             if($this->isStrictMode) {
                 $stores = is_array($storeIds) ? implode(',', $storeIds) : $storeIds;
                 throw new AlreadyExistsException(__('Page with ID: %1 Already exists for Store(s) %2', $id, $stores));
@@ -224,7 +231,8 @@ class CmsInstaller extends AbstractInstaller
      */
     public function updatePage($id, $content = null, $storeIds = null, $params = [])
     {
-        if(!$page = $this->getPage($id, $storeIds)) {
+        $page = $this->getPage($id, $storeIds);
+        if(!$page) {
             if($this->isStrictMode) {
                 $stores = is_array($storeIds) ? implode(',', $storeIds) : $storeIds;
                 throw new NoSuchEntityException(__('Page with ID: %1 Does not exists for Store(s) %2', $id, $stores));
@@ -246,7 +254,8 @@ class CmsInstaller extends AbstractInstaller
 
     public function deletePage($id, $storeIds = null)
     {
-        if(!$page = $this->getPage($id, $storeIds)) {
+        $page = $this->getPage($id, $storeIds);
+        if(!$page) {
             if($this->isStrictMode) {
                 $stores = is_array($storeIds) ? implode(',', $storeIds) : $storeIds;
                 throw new NoSuchEntityException(__('Page with ID: %1 Does not exists for Store(s) %2', $id, $stores));
@@ -306,16 +315,16 @@ class CmsInstaller extends AbstractInstaller
 
     protected function getStoreIds($stores = null)
     {
-        // CASE: Default Case
+        // Default Case
         if (is_null($stores)) {
             return [0];
         }
-        // CASE: Single Value
+        // Single Value Case
         if (!is_array($stores)) {
             $storeId = $this->getStoreId($stores);
             return $storeId;
         }
-        // CASE: Array Values
+        // Array Values Case
         $storeIds = [];
         foreach ($stores as $storeCode) {
             $storeId = $this->getStoreId($storeCode);

@@ -3,24 +3,36 @@
   "description": "Mauro Nigrele - Setup Tools",
   "type": "magento2-module",
   "version": "0.1.0",
-  "license": [
-    "OSL-3.0",
-    "AFL-3.0"
-  ],
-  "authors": [
-    {
-      "name": "Mauro Nigrele",
-      "email": "mauro.nigrele@gmail.com"
-    }
-  ],
+  "license": "MIT",
   "require": {
     "php": "~5.5.0|~5.6.0|~7.0.0",
-    "magento/magento-composer-installer": "*"
+    "magento/framework": "100.0.*",
+    "magento/base": "100.0.*",
+    "magento/module-store": "100.0.*",
+    "magento/module-catalog": "100.0.*",
+    "magento/module-customer": "100.0.*",
+    "magento/module-cms": "100.0.*"
   },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://repo.magento.com/"
+    }
+  ],
+  "minimum-stability": "beta",
   "autoload": {
-    "files": [ "registration.php" ],
+    "files": [
+      "registration.php"
+    ],
     "psr-4": {
       "MauroNigrele\\SetupTools\\": "MauroNigrele/SetupTools"
     }
-  }
+  },
+  "authors": [
+    {
+      "name": "Mauro Nigrele",
+      "email": "mauro.nigrele@gmail.com",
+      "homepage": "https://www.mauronigrele.com"
+    }
+  ]
 }

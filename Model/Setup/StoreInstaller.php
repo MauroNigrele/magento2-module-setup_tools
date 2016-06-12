@@ -193,46 +193,184 @@ class StoreInstaller extends AbstractInstaller
     /*********************************************************************************************/
 
     /**
+     * @param $schema
+     * @param $key
+     * @param array $default
+     * @return array
+     */
+    public function getConfigKey($schema, $key, $default = [])
+    {
+        if (isset($schema[$key]) && is_array($schema[$key])) {
+            return $schema[$key];
+        }
+        return $default;
+    }
+
+    /**
      * @param array $configSchema
      * @return $this
      */
     public function setConfigSchema(Array $configSchema)
     {
         // Default Config
-        if(isset($configSchema['default']) && is_array($configSchema['default'])) {
-            foreach($configSchema['default'] as $path => $value) {
-                $this->setConfig($path, $value);
+        foreach($this->getConfigKey($configSchema,'default') as $path => $value) {
+            // Eval Custom Configuration
+            if($path[0] === '_') {
+                $this->setCustomConfig($path, $value);
+                continue;
             }
+            $this->setConfig($path,$value);
         }
         // Website Config
-        if(isset($configSchema['websites']) && is_array($configSchema['websites'])) {
-            foreach($configSchema['websites'] as $code => $websiteConfig) {
-                $website = $this->getWebsite($code);
-                // Website Validation
-                if(!$website->getId()) {
-                    $this->logger->warning(__('There is no Website with code: %1', $code));
+        foreach($this->getConfigKey($configSchema,'websites') as $code => $websiteConfig) {
+            $website = $this->getWebsite($code);
+            // Website Validation
+            if(!$website->getId()) {
+                $this->logger->warning(__('There is no Website with code: %1', $code));
+                continue;
+            }
+            foreach($websiteConfig as $path => $value) {
+                // Eval Custom Configuration
+                if($path[0] === '_') {
+                    $this->setCustomConfig($path, $value, 'websites', $website->getId());
                     continue;
                 }
-                foreach($websiteConfig as $path => $value) {
-                    $this->setConfig($path, $value, 'websites', $website->getId());
-                }
+                $this->setConfig($path,$value,'websites',$website->getId());
             }
         }
         // Store Config
-        if(isset($configSchema['stores']) && is_array($configSchema['stores'])) {
-            foreach($configSchema['stores'] as $code => $storeConfig) {
-                $store = $this->getStore($code);
-                // Store Validation
-                if(!$store->getId()) {
-                    $this->logger->warning(__('There is no Store with code: %1', $code));
+        foreach($this->getConfigKey($configSchema,'stores')  as $code => $storeConfig) {
+            $store = $this->getStore($code);
+            // Store Validation
+            if(!$store->getId()) {
+                $this->logger->warning(__('There is no Store with code: %1', $code));
+                continue;
+            }
+            foreach($storeConfig as $path => $value) {
+                // Eval Custom Configuration
+                if($path[0] === '_') {
+                    $this->setCustomConfig($path, $value, 'stores', $website->getId());
                     continue;
                 }
-                foreach($storeConfig as $path => $value) {
-                    $this->setConfig($path, $value, 'stores', $store->getId());
-                }
+                $this->setConfig($path,$value,'stores',$website->getId());
             }
         }
         return $this;
+    }
+
+    public function setCustomConfig($path, $value, $scopeType = 'default', $scopeCode = 0)
+    {
+        switch ($path) {
+            // Unsecure Base Url
+            case '_unsecure_base_url_prefix':
+                $this->setUrlPrefixConfig('web/unsecure/base_url',$value,$scopeType,$scopeCode);
+                break;
+            case '_unsecure_base_url_suffix':
+                $this->setUrlSuffixConfig('web/unsecure/base_url',$value,$scopeType,$scopeCode);
+                break;
+            // Secure Base Url
+            case '_secure_base_url_prefix':
+                $this->setUrlPrefixConfig('web/secure/base_url',$value,$scopeType,$scopeCode);
+                break;
+            case '_secure_base_url_suffix':
+                $this->setUrlSuffixConfig('web/secure/base_url',$value,$scopeType,$scopeCode);
+                break;
+            // Payment Methods
+            case '_payment_methods':
+                $this->setMethodsConfig('payment',$value,$scopeType,$scopeCode);
+                break;
+            // Shipping Methods
+            case '_shipping_methods':
+                $this->setMethodsConfig('carriers',$value,$scopeType,$scopeCode);
+                break;
+        }
+        return $this;
+    }
+
+    /**
+     * @param $key
+     * @param array $activeMethods
+     * @param string $scopeType
+     * @param int $scopeCode
+     * @return $this
+     */
+    public function setMethodsConfig($key, array $activeMethods, $scopeType = 'default', $scopeCode = 0)
+    {
+        $methods = $this->getConfig($key,$scopeType,$scopeCode);
+        foreach ($methods as $code => $data) {
+            if(!isset($data['active'])) {
+                continue;
+            }
+            // Disable Methods
+            if(!in_array($code, $activeMethods) && $data['active'] == 1) {
+                $this->setConfig($key . '/' . $code . '/active',0,$scopeType,$scopeCode);
+            }
+            // Enable Methods
+            if(in_array($code, $activeMethods) && $data['active'] == 0) {
+                $this->setConfig($key . '/' . $code . '/active',1,$scopeType,$scopeCode);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param $path
+     * @param $prefix
+     * @param string $scopeType
+     * @param int $scopeCode
+     * @return $this
+     */
+    public function setUrlPrefixConfig($path, $prefix, $scopeType = 'default', $scopeCode = 0)
+    {
+        $currentUrl = $this->getConfig($path,$scopeType,$scopeCode);
+        $parts = explode('://',$currentUrl);
+        $protocol = $parts[0];
+        $levels = array_filter(explode('.', $parts[1]));
+
+        // Check Already Configured
+        if($levels[0] == $prefix) {
+            return $this;
+        }
+        $value = $protocol . '://' . $prefix . '.' . $parts[1];
+        if(substr($value, -1) !== '/') {
+            $value .= '/';
+        }
+
+        $this->setConfig($path,$value,$scopeType,$scopeCode);
+    }
+
+    /**
+     * @param $path
+     * @param $suffix
+     * @param string $scopeType
+     * @param int $scopeCode
+     * @return $this
+     */
+    public function setUrlSuffixConfig($path, $suffix, $scopeType = 'default', $scopeCode = 0)
+    {
+        $defaultUrl = $this->getConfig($path);
+        $currentUrl = $this->getConfig($path,$scopeType,$scopeCode);
+        $parts = explode('://',$currentUrl);
+        $protocol = $parts[0];
+        $levels = array_filter(explode('/', $parts[1]));
+
+        // Check Media & Static Folders
+        $pathParts = explode('/',$path);
+        $pathStatic = $pathParts[0] .'/'. $pathParts[1] . '/base_static_url/' ;
+        $pathMedia  = $pathParts[0] .'/'. $pathParts[1] . '/base_media_url/' ;
+        // Static & Media Config
+        $this->setConfig($pathStatic,$defaultUrl . 'pub/static/',$scopeType,$scopeCode);
+        $this->setConfig($pathMedia,$defaultUrl . 'pub/media/',$scopeType,$scopeCode);
+
+        // Check Already Configured
+        if(end($levels) == $suffix) {
+            return $this;
+        }
+        $value = $protocol . '://' . $parts[1] . $suffix;
+        if(substr($value, -1) !== '/') {
+            $value .= '/';
+        }
+        $this->setConfig($path,$value,$scopeType,$scopeCode);
     }
 
 
@@ -243,55 +381,52 @@ class StoreInstaller extends AbstractInstaller
     public function setThemeConfigSchema(Array $configSchema)
     {
         // Default Theme Config
-        if (isset($configSchema['default'])){
-            $theme = $this->themeFactory->create()->load($configSchema['default'], 'code');
+        $defaultTheme = (isset($configSchema['default'])) ? $configSchema['default'] : false;
+        if ($defaultTheme) {
+            $theme = $this->themeFactory->create()->load($defaultTheme, 'code');
             /** @var Theme $theme */
             // Theme Validation
             if ($theme->getId()){
                 $this->setConfig('design/theme/theme_id', $theme->getId());
             } else {
-                $this->logger->warning(__('There is no Theme with code: %1', $configSchema['default']));
+                $this->logger->warning(__('There is no Theme with code: %1', $defaultTheme));
             }
         }
 
         // Website Theme Config
-        if (isset($configSchema['websites']) && is_array($configSchema['websites'])){
-            foreach ($configSchema['websites'] as $code => $themeCode){
-                $website = $this->getWebsite($code);
-                $theme = $this->themeFactory->create()->load($themeCode, 'code');
-                // Website Validation
-                if (!$website->getId()){
-                    $this->logger->warning(__('There is no Website with code: %1', $code));
-                    continue;
-                }
-                // Theme Validation
-                if (!$theme->getId()){
-                    $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
-                    continue;
-                }
-                // Set Config
-                $this->setConfig('design/theme/theme_id', $theme->getId(), 'websites', $website->getId());
+        foreach ($this->getConfigKey($configSchema,'websites') as $code => $themeCode) {
+            $website = $this->getWebsite($code);
+            $theme = $this->themeFactory->create()->load($themeCode, 'code');
+            // Website Validation
+            if (!$website->getId()){
+                $this->logger->warning(__('There is no Website with code: %1', $code));
+                continue;
             }
+            // Theme Validation
+            if (!$theme->getId()){
+                $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
+                continue;
+            }
+            // Set Config
+            $this->setConfig('design/theme/theme_id', $theme->getId(), 'websites', $website->getId());
         }
 
         // Store Theme Config
-        if (isset($configSchema['stores']) && is_array($configSchema['stores'])){
-            foreach ($configSchema['stores'] as $code => $themeCode){
-                $store = $this->getStore($code);
-                $theme = $this->themeFactory->create()->load($themeCode, 'code');
-                // Store Validation
-                if (!$store->getId()){
-                    $this->logger->warning(__('There is no Store with code: %1', $code));
-                    continue;
-                }
-                // Theme Validation
-                if (!$theme->getId()){
-                    $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
-                    continue;
-                }
-                // Set Config
-                $this->setConfig('design/theme/theme_id', $theme->getId(), 'stores', $store->getId());
+        foreach ($this->getConfigKey($configSchema,'store') as $code => $themeCode){
+            $store = $this->getStore($code);
+            $theme = $this->themeFactory->create()->load($themeCode, 'code');
+            // Store Validation
+            if (!$store->getId()){
+                $this->logger->warning(__('There is no Store with code: %1', $code));
+                continue;
             }
+            // Theme Validation
+            if (!$theme->getId()){
+                $this->logger->warning(__('There is no Theme with code: %1', $themeCode));
+                continue;
+            }
+            // Set Config
+            $this->setConfig('design/theme/theme_id', $theme->getId(), 'stores', $store->getId());
         }
         return $this;
     }
@@ -303,7 +438,7 @@ class StoreInstaller extends AbstractInstaller
 
     /**
      *
-     * @TODO Please Refactor This Ugly Method
+     * @TODO Refactor - This Method... Really Sucks
      *
      * @param array $data
      * @return $this
@@ -437,6 +572,14 @@ class StoreInstaller extends AbstractInstaller
     public function getDefaultStore()
     {
         return $this->storeManager->getDefaultStoreView();
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultStoreId()
+    {
+        return $this->getDefaultStore()->getId();
     }
 
     /**

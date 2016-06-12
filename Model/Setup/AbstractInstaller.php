@@ -126,7 +126,7 @@ abstract class AbstractInstaller
     }
 
     /**
-     * @param ModuleDataSetupInterface $setup
+     * @param null|ModuleDataSetupInterface $setup
      * @return \Magento\Eav\Setup\EavSetup
      * @throws LocalizedException
      */

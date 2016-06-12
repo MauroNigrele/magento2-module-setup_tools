@@ -17,28 +17,43 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\CategoryFactory;
-
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Framework\Exception\LocalizedException;
 
 class CatalogInstaller extends EavInstaller
 {
     protected $storeInstaller;
 
+    /**
+     * @var CategoryFactory
+     */
     protected $categoryFactory;
 
+    /**
+     * @var Collection\Factory
+     */
     protected $categoryCollectionFactory;
 
+    /**
+     * @var integer
+     */
     protected $productEntityTypeId;
 
-    protected $loadedStores = array();
+    /**
+     * @var array
+     */
+    protected $loadedStores = [];
 
-    protected $categorySkeleton = array(
+    /**
+     * @var array
+     */
+    protected $categorySkeleton = [
         'position'      => 1,
         'is_active'     => 1,
         'store_id'      => 0,
         'display_mode'  => Category::DM_PRODUCT,
         'include_in_menu' => 1,
-    );
+    ];
 
     /**
      * - Abstract Installer
@@ -53,6 +68,7 @@ class CatalogInstaller extends EavInstaller
      * @param AttributeFactory $attributeFactory
      * - Catalog Installer
      * @param CategoryFactory $categoryFactory
+     * @param Collection\Factory $categoryCollectionFactory
      * @param StoreInstaller $storeInstaller
      */
     public function __construct(
@@ -67,11 +83,13 @@ class CatalogInstaller extends EavInstaller
         GroupFactory $attributeGroupFactory,
         AttributeFactory $attributeFactory,
         // Catalog ->
-        StoreInstaller $storeInstaller,
-        CategoryFactory $categoryFactory
+        CategoryFactory $categoryFactory,
+        Collection\Factory $categoryCollectionFactory,
+        StoreInstaller $storeInstaller
     )
     {
         $this->categoryFactory = $categoryFactory;
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->storeInstaller = $storeInstaller;
         parent::__construct($objectManager, $registry, $logger, $config, $configWriter, $attributeSetFactory,
             $attributeGroupFactory, $attributeFactory);
@@ -118,7 +136,7 @@ class CatalogInstaller extends EavInstaller
 
     /**
      * @param string $name
-     * @param int $skeletonSetId
+     * @param null|integer $skeletonSetId
      * @return \Magento\Eav\Model\Entity\Attribute\Set
      * @throws LocalizedException
      */
@@ -160,17 +178,34 @@ class CatalogInstaller extends EavInstaller
 
     /******************************************************************************************** Product Attribute ***/
 
+    /**
+     * @param $id
+     * @return $this|\Magento\Framework\DataObject|null
+     * @throws LocalizedException
+     */
     public function getProductAttribute($id)
     {
         return $this->getAttribute($id, $this->getProductEntityType());
     }
 
+    /**
+     * @param $id
+     * @param $field
+     * @param null $value
+     * @return $this
+     * @throws LocalizedException
+     */
     public function updateProductAttribute($id, $field, $value = null)
     {
         $this->getEavSetup()->updateAttribute($this->getProductEntityType(), $id, $field, $value);
         return $this;
     }
 
+    /**
+     * @param $code
+     * @return $this
+     * @throws LocalizedException
+     */
     public function removeProductAttribute($code)
     {
         $this->getEavSetup()
@@ -178,6 +213,12 @@ class CatalogInstaller extends EavInstaller
         return $this;
     }
 
+    /**
+     * @param $code
+     * @param $data
+     * @return $this
+     * @throws LocalizedException
+     */
     public function addProductAttribute($code, $data)
     {
         $this->getEavSetup()
@@ -185,6 +226,10 @@ class CatalogInstaller extends EavInstaller
         return $this;
     }
 
+    /**
+     * @param $attributes
+     * @return $this
+     */
     public function addProductAttributes($attributes)
     {
         foreach($attributes as $code => $data){
@@ -193,6 +238,14 @@ class CatalogInstaller extends EavInstaller
         return $this;
     }
 
+    /**
+     * @param $setId
+     * @param $groupId
+     * @param $attributeId
+     * @param null $sortOrder
+     * @return $this
+     * @throws LocalizedException
+     */
     public function addProductAttributeToGroup($setId, $groupId, $attributeId, $sortOrder = null)
     {
         $this->getEavSetup()
@@ -218,11 +271,21 @@ class CatalogInstaller extends EavInstaller
 
     /******************************************************************************************** Category Attribute ***/
 
+    /**
+     * @param $id
+     * @return $this|\Magento\Framework\DataObject|null
+     * @throws LocalizedException
+     */
     public function getCategoryAttribute($id)
     {
         return $this->getAttribute($id, $this->getCategoryEntityType());
     }
 
+    /**
+     * @param $code
+     * @return $this
+     * @throws LocalizedException
+     */
     public function removeCategoryAttribute($code)
     {
         $this->getEavSetup()
@@ -230,6 +293,12 @@ class CatalogInstaller extends EavInstaller
         return $this;
     }
 
+    /**
+     * @param $code
+     * @param $data
+     * @return $this
+     * @throws LocalizedException
+     */
     public function addCategoryAttribute($code, $data)
     {
         $this->getEavSetup()
@@ -237,6 +306,10 @@ class CatalogInstaller extends EavInstaller
         return $this;
     }
 
+    /**
+     * @param $attributes
+     * @return $this
+     */
     public function addCategoryAttributes($attributes)
     {
         foreach($attributes as $code => $data){
@@ -244,7 +317,6 @@ class CatalogInstaller extends EavInstaller
         }
         return $this;
     }
-
 
     /******************************************************************************************************************/
     /********************************************************************************************* Category Methods ***/
@@ -266,8 +338,14 @@ class CatalogInstaller extends EavInstaller
         $rootCategory = $this->categoryFactory->create()->load($store->getRootCategoryId());
         // Append Children
         $this->addCategoryTreeChildren($rootCategory, $categories);
+
+        return $this;
     }
 
+    /**
+     * @param Category $parentCategory
+     * @param array $children
+     */
     public function addCategoryTreeChildren(Category $parentCategory, Array $children)
     {
         foreach($children as $index => $categoryData) {
@@ -305,10 +383,81 @@ class CatalogInstaller extends EavInstaller
         }
     }
 
+    /**
+     * @return \Magento\Catalog\Model\ResourceModel\Category\Collection
+     */
+    public function getCategoryCollection()
+    {
+        return $this->categoryCollectionFactory->create();
+    }
+
+    /**
+     * @return Category $category
+     */
+    public function getCategoryModel()
+    {
+        return $this->categoryFactory->create();
+    }
+
+    /**
+     * @param array $filters
+     * @return $this
+     */
+    public function cleanCategoriesUrlRewrites($filters = [])
+    {
+        $baseFilter = [
+            'entity_type' => ['eq' => 'category'],
+        ];
+        return $this->cleanUrlRewrites(array_merge_recursive($baseFilter, $filters));
+    }
+
+    /**
+     * @param Category $category
+     * @return $this
+     */
+    public function saveCategoryUrlRewrite(Category $category)
+    {
+        $categoryUrlRewriteGenerator = $this->objectManager->get('Magento\CatalogUrlRewrite\Model\CategoryUrlRewriteGenerator');
+        $urlPersist = $this->objectManager->get('Magento\UrlRewrite\Model\UrlPersistInterface');
+        $urlRewriteHandler = $this->objectManager->get('Magento\CatalogUrlRewrite\Observer\UrlRewriteHandler');
+        $urlRewrites = array_merge(
+            $categoryUrlRewriteGenerator->generate($category),
+            $urlRewriteHandler->generateProductUrlRewrites($category)
+        );
+        $urlPersist->replace($urlRewrites);
+        return $this;
+    }
+
     /******************************************************************************************************************/
     /******************************************************************************************************** Tools ***/
     /******************************************************************************************************************/
 
+    /**
+     * @param array $filters
+     * @return $this
+     */
+    public function cleanUrlRewrites($filters = [])
+    {
+        if(!count($filters)) {
+            $this->logger->alert(__('Process cleanUrlRewrites skipped, no filters received.'));
+            return $this;
+        }
+        $collection = $this->objectManager
+            ->get('Magento\UrlRewrite\Model\ResourceModel\UrlRewriteCollection');
+        /* @var \Magento\UrlRewrite\Model\ResourceModel\UrlRewriteCollection $collection */
+        foreach($filters as $field => $condition) {
+            $collection->addFieldToFilter($field,$condition);
+        }
+        $collection->getConnection()->query(
+            $collection->getConnection()->deleteFromSelect($collection->getSelectSql(), 'main_table')
+        );
+        return $this;
+    }
+
+    /**
+     * @param $storeCode
+     * @return mixed
+     */
     protected function getStore($storeCode)
     {
         if (!isset($this->loadedStores[$storeCode])) {

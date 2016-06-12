@@ -76,7 +76,7 @@ class EavInstaller extends AbstractInstaller
 
     /**
      * @param int|string $id
-     * @param integer $entityTypeId
+     * @param null|integer $entityTypeId
      * @return \Magento\Eav\Model\Entity\Attribute\Set | null
      * @throws LocalizedException
      */
