@@ -64,7 +64,7 @@ class Installer extends AbstractInstaller
         CustomerInstaller $customerInstaller,
         SalesInstaller $salesInstaller,
         StoreInstaller $storeInstaller
-    ){
+    ) {
         // Installers
         $this->storeInstaller = $storeInstaller;
         $this->catalogInstaller = $catalogInstaller;
