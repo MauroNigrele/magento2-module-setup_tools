@@ -10,14 +10,13 @@ use Psr\Log\LoggerInterface;
 
 class CustomerInstaller extends AbstractInstaller
 {
-    
     public function __construct(
         ObjectManagerInterface $objectManager,
         Registry $registry,
         LoggerInterface $logger,
         ScopeConfigInterface $config,
         WriterInterface $configWriter
-    ){
+    ) {
         parent::__construct($objectManager, $registry, $logger, $config, $configWriter);
     }
 }

@@ -22,7 +22,6 @@ use Magento\Framework\Exception\ValidatorException;
 
 class CmsInstaller extends AbstractInstaller
 {
-    
     /**
      * @var bool
      */
@@ -93,7 +92,7 @@ class CmsInstaller extends AbstractInstaller
         StoreManagerInterface $storeManager,
         PageFactory $pageFactory,
         BlockFactory $blockFactory
-    ){
+    ) {
         $this->storeManager = $storeManager;
         $this->pageFactory = $pageFactory;
         $this->blockFactory = $blockFactory;
@@ -165,7 +164,7 @@ class CmsInstaller extends AbstractInstaller
      */
     public function setIsStrictMode($value)
     {
-        $this->isStrictMode = (bool)$value;
+        $this->isStrictMode = (bool) $value;
     }
 
     /*********************************************************************************************/
@@ -175,7 +174,7 @@ class CmsInstaller extends AbstractInstaller
     /**
      * @param $id
      * @param null|array $storeIds
-     * @return \Magento\Cms\Model\Page|null
+     * @return \Magento\Framework\DataObject|null
      */
     public function getPage($id, $storeIds = null)
     {
