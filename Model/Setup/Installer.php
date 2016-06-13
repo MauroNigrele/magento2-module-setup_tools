@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 
 class Installer extends AbstractInstaller
 {
+    
     /**
      * @var StoreInstaller
      */

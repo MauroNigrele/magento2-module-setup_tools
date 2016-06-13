@@ -28,6 +28,7 @@ use Psr\Log\LoggerInterface;
 
 class StoreInstaller extends AbstractInstaller
 {
+
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
@@ -866,7 +867,15 @@ class StoreInstaller extends AbstractInstaller
      */
     public function getDefaultWebsite()
     {
-        return $this->storeManager->getDefaultStoreView()->getWebsite();
+        return $this->getStoreManager()->getWebsite($this->getDefaultWebsiteId());
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultWebsiteId()
+    {
+        return $this->getStoreManager()->getDefaultStoreView()->getWebsiteId();
     }
 
     /**
@@ -930,9 +939,6 @@ class StoreInstaller extends AbstractInstaller
         if (!$website->getId()) {
             throw new NoSuchEntityException(__('Invalid Website.'));
         }
-
-//        $websiteData = $data;
-//        unset($websiteData['_groups']);
 
         $website->addData($data)
             ->save();

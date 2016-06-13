@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 
 class CustomerInstaller extends AbstractInstaller
 {
+    
     public function __construct(
         ObjectManagerInterface $objectManager,
         Registry $registry,

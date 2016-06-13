@@ -22,6 +22,10 @@ use Magento\Framework\Exception\LocalizedException;
 
 class CatalogInstaller extends EavInstaller
 {
+
+    /**
+     * @var StoreInstaller
+     */
     protected $storeInstaller;
 
     /**

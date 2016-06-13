@@ -22,6 +22,7 @@ use Magento\Framework\Exception\ValidatorException;
 
 class CmsInstaller extends AbstractInstaller
 {
+    
     /**
      * @var bool
      */
