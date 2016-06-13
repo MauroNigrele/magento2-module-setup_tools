@@ -1,12 +1,14 @@
 <?php
 
-namespace MauroNigrele\SetupTools\Model\Setup;
+namespace MauroNigrele\SetupTools\Model\Setup\Sales;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\Config\Storage\WriterInterface;
+// Abstract Installer
+use MauroNigrele\SetupTools\Model\Setup\AbstractInstaller;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 
 /**
  * Class SalesInstaller
@@ -18,7 +20,7 @@ use Psr\Log\LoggerInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class SalesInstaller extends AbstractInstaller
+class Installer extends AbstractInstaller
 {
     
     public function __construct(

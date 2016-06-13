@@ -2,6 +2,12 @@
 
 namespace MauroNigrele\SetupTools\Model\Setup;
 
+use MauroNigrele\SetupTools\Model\Setup\Store\Installer as StoreInstaller;
+use MauroNigrele\SetupTools\Model\Setup\Catalog\Installer as CatalogInstaller;
+use MauroNigrele\SetupTools\Model\Setup\Cms\Installer as CmsInstaller;
+use MauroNigrele\SetupTools\Model\Setup\Customer\Installer as CustomerInstaller;
+use MauroNigrele\SetupTools\Model\Setup\Sales\Installer as SalesInstaller;
+
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\ObjectManagerInterface;
@@ -55,6 +61,7 @@ class Installer extends AbstractInstaller
      * @param LoggerInterface $logger
      * @param ScopeConfigInterface $config
      * @param WriterInterface $configWriter
+     * Custom Installers
      * @param CatalogInstaller $catalogInstaller
      * @param CmsInstaller $cmsInstaller
      * @param CustomerInstaller $customerInstaller
@@ -67,8 +74,8 @@ class Installer extends AbstractInstaller
         Registry $registry,
         LoggerInterface $logger,
         ScopeConfigInterface $config,
-        //
         WriterInterface $configWriter,
+        // Custom Installers
         CatalogInstaller $catalogInstaller,
         CmsInstaller $cmsInstaller,
         CustomerInstaller $customerInstaller,

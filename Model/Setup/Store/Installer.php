@@ -1,6 +1,8 @@
 <?php
 
-namespace MauroNigrele\SetupTools\Model\Setup;
+namespace MauroNigrele\SetupTools\Model\Setup\Store;
+
+use MauroNigrele\SetupTools\Model\Setup\AbstractInstaller;
 
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -35,7 +37,7 @@ use Psr\Log\LoggerInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class StoreInstaller extends AbstractInstaller
+class Installer extends AbstractInstaller
 {
 
     /**

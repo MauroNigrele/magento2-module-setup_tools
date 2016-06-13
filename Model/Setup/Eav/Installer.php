@@ -6,9 +6,10 @@
  * Time: 17:56
  */
 
-namespace MauroNigrele\SetupTools\Model\Setup;
+namespace MauroNigrele\SetupTools\Model\Setup\Eav;
 
 // Abstract Installer
+use MauroNigrele\SetupTools\Model\Setup\AbstractInstaller;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Psr\Log\LoggerInterface;
@@ -18,12 +19,11 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Eav\Model\Entity\Attribute\SetFactory;
 use Magento\Eav\Model\Entity\Attribute\GroupFactory;
 use Magento\Eav\Model\Entity\AttributeFactory;
-
 use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class EavInstaller
- * @package MauroNigrele\SetupTools\Model\Setup
+ * @package MauroNigrele\SetupTools\Model\Setup\Eav
  *
  * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -31,7 +31,7 @@ use Magento\Framework\Exception\LocalizedException;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class EavInstaller extends AbstractInstaller
+class Installer extends AbstractInstaller
 {
 
     /**

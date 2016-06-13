@@ -1,6 +1,8 @@
 <?php
 
-namespace MauroNigrele\SetupTools\Model\Setup;
+namespace MauroNigrele\SetupTools\Model\Setup\Catalog;
+
+use MauroNigrele\SetupTools\Model\Setup\Eav\Installer as EavInstaller;
 
 // Abstract Installer
 use Magento\Framework\ObjectManagerInterface;
@@ -22,7 +24,7 @@ use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class CatalogInstaller
- * @package MauroNigrele\SetupTools\Model\Setup
+ * @package MauroNigrele\SetupTools\Model\Setup\Catalog
  *
  * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -30,7 +32,7 @@ use Magento\Framework\Exception\LocalizedException;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class CatalogInstaller extends EavInstaller
+class Installer extends EavInstaller
 {
 
     /**

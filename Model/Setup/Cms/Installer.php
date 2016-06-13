@@ -1,6 +1,8 @@
 <?php
 
-namespace MauroNigrele\SetupTools\Model\Setup;
+namespace MauroNigrele\SetupTools\Model\Setup\Cms;
+
+use MauroNigrele\SetupTools\Model\Setup\AbstractInstaller;
 
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
@@ -29,7 +31,7 @@ use Magento\Framework\Exception\ValidatorException;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class CmsInstaller extends AbstractInstaller
+class Installer extends AbstractInstaller
 {
 
     /**
