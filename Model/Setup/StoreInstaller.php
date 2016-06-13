@@ -346,6 +346,7 @@ class StoreInstaller extends AbstractInstaller
         }
 
         $this->setConfig($path, $value, $scopeType, $scopeCode);
+        return $this;
     }
 
     /**
@@ -380,6 +381,7 @@ class StoreInstaller extends AbstractInstaller
             $value .= '/';
         }
         $this->setConfig($path, $value, $scopeType, $scopeCode);
+        return $this;
     }
 
 
@@ -577,7 +579,7 @@ class StoreInstaller extends AbstractInstaller
     }
 
     /**
-     * @return \Magento\Store\Model\Store
+     * @return \Magento\Store\Model\Store|null
      */
     public function getDefaultStore()
     {
