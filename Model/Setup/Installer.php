@@ -10,10 +10,19 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\DataObject;
 use Psr\Log\LoggerInterface;
 
-
+/**
+ * Class Installer
+ * @package MauroNigrele\SetupTools\Model\Setup
+ *
+ * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Installer extends AbstractInstaller
 {
-    
+
     /**
      * @var StoreInstaller
      */

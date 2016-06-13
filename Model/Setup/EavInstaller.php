@@ -21,6 +21,16 @@ use Magento\Eav\Model\Entity\AttributeFactory;
 
 use Magento\Framework\Exception\LocalizedException;
 
+/**
+ * Class EavInstaller
+ * @package MauroNigrele\SetupTools\Model\Setup
+ *
+ * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class EavInstaller extends AbstractInstaller
 {
 
