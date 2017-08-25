@@ -3,6 +3,8 @@
 namespace MauroNigrele\SetupTools\Model\Setup;
 
 // Abstract Installer
+use Magento\Catalog\Api\CategoryAttributeRepositoryInterface;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Psr\Log\LoggerInterface;
@@ -12,6 +14,7 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Eav\Model\Entity\Attribute\SetFactory;
 use Magento\Eav\Model\Entity\Attribute\GroupFactory;
 use Magento\Eav\Model\Entity\AttributeFactory;
+
 // Catalog Installer
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
@@ -19,6 +22,7 @@ use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\CategoryFactory;
 use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Framework\Exception\LocalizedException;
+
 
 /**
  * Class CatalogInstaller
@@ -39,6 +43,11 @@ class CatalogInstaller extends EavInstaller
     protected $storeInstaller;
 
     /**
+     * @var ProductFactory
+     */
+    protected $productFactory;
+
+    /**
      * @var CategoryFactory
      */
     protected $categoryFactory;
@@ -52,6 +61,10 @@ class CatalogInstaller extends EavInstaller
      * @var integer
      */
     protected $productEntityTypeId;
+
+    protected $productAttributeRepository;
+
+    protected $categoryAttributeRepository;
 
     /**
      * @var array
@@ -84,6 +97,11 @@ class CatalogInstaller extends EavInstaller
      * @param CategoryFactory $categoryFactory
      * @param Collection\Factory $categoryCollectionFactory
      * @param StoreInstaller $storeInstaller
+     * @param ProductFactory $productFactory
+     * - Attribute Repository
+     * @param ProductAttributeRepositoryInterface $productAttributeRepository
+     * @param CategoryAttributeRepositoryInterface $categoryAttributeRepository
+     *
      */
     public function __construct(
         // Abstract Installer
@@ -97,13 +115,22 @@ class CatalogInstaller extends EavInstaller
         GroupFactory $attributeGroupFactory,
         AttributeFactory $attributeFactory,
         // Catalog ->
+        ProductFactory $productFactory,
         CategoryFactory $categoryFactory,
         Collection\Factory $categoryCollectionFactory,
-        StoreInstaller $storeInstaller
+        StoreInstaller $storeInstaller,
+        // Repositories
+        ProductAttributeRepositoryInterface $productAttributeRepository,
+        CategoryAttributeRepositoryInterface $categoryAttributeRepository
     ) {
+        $this->productFactory = $productFactory;
         $this->categoryFactory = $categoryFactory;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->storeInstaller = $storeInstaller;
+
+        $this->productAttributeRepository = $productAttributeRepository;
+        $this->categoryAttributeRepository = $categoryAttributeRepository;
+
         parent::__construct($objectManager, $registry, $logger, $config, $configWriter, $attributeSetFactory,
             $attributeGroupFactory, $attributeFactory);
     }
@@ -113,8 +140,44 @@ class CatalogInstaller extends EavInstaller
     /********************************************************************************************** Product Methods ***/
     /******************************************************************************************************************/
 
+    /*********************************************************************************************** Product Entity ***/
+
+    /**
+     * @return \Magento\Catalog\Model\Product
+     */
+    public function getProductModel()
+    {
+        return $this->productFactory->create();
+    }
+
+    /**
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    public function getProductCollection()
+    {
+        return $this->getProductModel()->getResourceCollection();
+    }
+
+
     /**************************************************************************************** Product Attribute Set ***/
 
+    /**
+     * @return ProductAttributeRepositoryInterface
+     */
+    public function getProductAttributeRepository()
+    {
+        return $this->productAttributeRepository;
+    }
+    
+    public function getAllProductAttributes()
+    {
+        $searchCriteria = $this->objectManager
+            ->create('\Magento\Framework\Api\SearchCriteriaInterface')
+            ->setPageSize(999999);
+        
+        return $this->getProductAttributeRepository()
+            ->getList($searchCriteria)->getItems();
+    }
 
     protected function getProductEntityType()
     {
@@ -273,6 +336,14 @@ class CatalogInstaller extends EavInstaller
 
 
     /*************************************************************************************** Category Attribute Set ***/
+
+    /**
+     * @return CategoryAttributeRepositoryInterface
+     */
+    public function getCategoryAttributeRepository()
+    {
+        return $this->categoryAttributeRepository;
+    }
 
     /**
      * @return string

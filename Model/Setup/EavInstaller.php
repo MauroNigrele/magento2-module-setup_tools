@@ -9,6 +9,7 @@
 namespace MauroNigrele\SetupTools\Model\Setup;
 
 // Abstract Installer
+use Magento\Eav\Api\AttributeRepositoryInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Psr\Log\LoggerInterface;
@@ -220,5 +221,4 @@ class EavInstaller extends AbstractInstaller
         throw new LocalizedException(__('You have to define the "entity_type_id" in order to get an Attribute by code.'));
     }
 
-    
 }

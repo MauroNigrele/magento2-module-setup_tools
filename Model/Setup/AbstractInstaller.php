@@ -48,6 +48,11 @@ abstract class AbstractInstaller
      * @var \Magento\Eav\Setup\EavSetup
      */
     protected $eavSetup;
+    
+    /**
+     * @var string
+     */
+    protected $moduleName;
 
     /**
      * AbstractInstaller constructor.
@@ -122,6 +127,17 @@ abstract class AbstractInstaller
     public function getModuleDataSetup()
     {
         return $this->moduleDataSetup;
+    }
+    
+    public function setModuleName($name)
+    {
+        $this->moduleName = $name;
+        return $this;
+    }
+    
+    public function getModuleName()
+    {
+        return $this->moduleName;
     }
 
     /**
