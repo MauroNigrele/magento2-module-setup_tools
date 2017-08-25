@@ -8,8 +8,7 @@ Build Status
 ------------
 
 +------------------------+---------------------------------------------------------------------------------------------------------------------+
-| **Status**             | .. image:: https://travis-ci.org/MauroNigrele/magento2-module-setup_tools.svg?branch=master                         |
-|                        |    :target: https://travis-ci.org/MauroNigrele/magento2-module-setup_tools                                          |
+| **Status**             |                        |                                             |
 |                        | .. image:: https://scrutinizer-ci.com/g/MauroNigrele/magento2-module-setup_tools/badges/quality-score.png?b=master  |
 |                        |    :target: https://scrutinizer-ci.com/g/MauroNigrele/magento2-module-setup_tools/?branch=master                    |
 +------------------------+---------------------------------------------------------------------------------------------------------------------+
