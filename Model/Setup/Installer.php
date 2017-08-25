@@ -8,6 +8,7 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\DataObject;
+use Magento\TestFramework\Inspection\Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -83,15 +84,61 @@ class Installer extends AbstractInstaller
         $this->customerInstaller = $customerInstaller;
         // Parent
         parent::__construct($objectManager, $registry, $logger, $config, $configWriter);
+        // Module Name
+        $this->initModuleName();
+        
     }
-
-    protected function allowRemoveAction()
+    
+    protected function initModuleName()
     {
-        // Allow Remove
-        $this->registry->register('isSecureArea', true);
+        if(!$this->moduleName) {
+            
+            $class = get_class($this);
+            $moduleName = str_replace(
+                '\\',
+                '_',
+                substr($class, 0, strpos($class, '\\Setup'))
+            );
+        }
+        // Parent
+        $this->setModuleName($moduleName);
+        // Installers
+        $this->getStoreInstaller()->setModuleName($moduleName);
+        $this->getCatalogInstaller()->setModuleName($moduleName);
+        $this->getCmsInstaller()->setModuleName($moduleName);
+        $this->getSalesInstaller()->setModuleName($moduleName);
+        $this->getCustomerInstaller()->setModuleName($moduleName);
         return $this;
     }
 
+    /**
+     * @param string $code
+     * @return $this
+     */
+    protected function setAreaCode($code = 'frontend')
+    {
+        try {
+            // Set State
+            $this->objectManager->get('Magento\Framework\App\State')
+                ->setAreaCode($code);
+        } catch (\Exception $e) {
+            // Already Set?
+        }
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function allowRemoveAction()
+    {
+        // Allow Remove
+        if(!$this->registry->registry('isSecureArea')) {
+            $this->registry->register('isSecureArea', true);
+        }
+        return $this;
+    }
+    
     /**
      * @param ModuleDataSetupInterface $setup
      * @return $this
@@ -104,6 +151,14 @@ class Installer extends AbstractInstaller
         $this->getStoreInstaller()->setModuleDataSetup($setup);
         $this->getSalesInstaller()->setModuleDataSetup($setup);
         return $this;
+    }
+    
+    /**
+     * @return \Magento\Framework\Api\SearchCriteriaBuilder
+     */
+    public function getSearchCriteriaBuilder()
+    {
+        return $this->objectManager->create('Magento\Framework\Api\SearchCriteriaBuilder');
     }
 
     /*********************************************************************************************/
