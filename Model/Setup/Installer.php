@@ -7,8 +7,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Framework\DataObject;
-use Magento\TestFramework\Inspection\Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -92,7 +90,6 @@ class Installer extends AbstractInstaller
     protected function initModuleName()
     {
         if(!$this->moduleName) {
-            
             $class = get_class($this);
             $moduleName = str_replace(
                 '\\',

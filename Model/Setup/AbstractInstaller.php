@@ -156,5 +156,31 @@ abstract class AbstractInstaller
         }
         return $this->eavSetup;
     }
+    
+    function formattedExport($var, $indent="") {
+        switch (gettype($var)) {
+            case "string":
+//                return '\''. $var . '\'';
+//                return "'" . addcslashes($var, "\\\$\"\r\n\t\v\f") . "'";
+                return '"' . addcslashes($var, "\\\$\"\r\n\t\v\f") . '"';
+            case "integer":
+            case "int":
+            case "float":
+                return $var;
+            case "array":
+                $indexed = array_keys($var) === range(0, count($var) - 1);
+                $r = [];
+                foreach ($var as $key => $value) {
+                    $r[] = "$indent    "
+                        . ($indexed ? "" : $this->formattedExport($key) . " => ")
+                        . $this->formattedExport($value, "$indent    ");
+                }
+                return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
+            case "boolean":
+                return $var ? "true" : "false";
+            default:
+                return var_export($var, true);
+        }
+    }
 
 }

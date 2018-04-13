@@ -24,6 +24,7 @@ use Magento\Cms\Model\ResourceModel\Page\Collection as PageCollection;
 use Magento\Cms\Model\BlockFactory;
 use Magento\Cms\Model\Block;
 use Magento\Cms\Model\ResourceModel\Block\Collection as BlockCollection;
+use Zend\Code\Generator\ValueGenerator;
 
 /**
  * Class CmsInstaller
@@ -37,27 +38,27 @@ use Magento\Cms\Model\ResourceModel\Block\Collection as BlockCollection;
  */
 class CmsInstaller extends AbstractInstaller
 {
-
+    
     /**
      * @var bool
      */
     protected $isStrictMode = false;
-
+    
     /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
-
+    
     /**
      * @var PageFactory
      */
     protected $pageFactory;
-
+    
     /**
      * @var BlockFactory
      */
     protected $blockFactory;
-
+    
     /**
      * @var []
      */
@@ -72,11 +73,11 @@ class CmsInstaller extends AbstractInstaller
      * @var FileIo
      */
     protected $fileIo;
-
+    
     /*********************************************************************************************/
     /******************************************************************************** SKELETONS **/
     /*********************************************************************************************/
-
+    
     /**
      * @var array
      */
@@ -86,7 +87,7 @@ class CmsInstaller extends AbstractInstaller
         'page_layout' => '1column',
         'under_version_control' => '0',
     ];
-
+    
     /**
      * @var array
      */
@@ -130,11 +131,11 @@ class CmsInstaller extends AbstractInstaller
         
         parent::__construct($objectManager, $registry, $logger, $config, $configWriter);
     }
-
+    
     /*********************************************************************************************/
     /********************************************************************************** GETTERS **/
     /*********************************************************************************************/
-
+    
     /**
      * @return StoreManagerInterface
      */
@@ -142,7 +143,7 @@ class CmsInstaller extends AbstractInstaller
     {
         return $this->storeManager;
     }
-
+    
     /**
      * @return PageFactory
      */
@@ -150,7 +151,7 @@ class CmsInstaller extends AbstractInstaller
     {
         return $this->pageFactory;
     }
-
+    
     /**
      * @return Page
      */
@@ -158,7 +159,7 @@ class CmsInstaller extends AbstractInstaller
     {
         return $this->getPageFactory()->create();
     }
-
+    
     /**
      * @return PageCollection
      */
@@ -166,7 +167,7 @@ class CmsInstaller extends AbstractInstaller
     {
         return $this->getPageModel()->getCollection();
     }
-
+    
     /**
      * @return BlockFactory
      */
@@ -174,7 +175,7 @@ class CmsInstaller extends AbstractInstaller
     {
         return $this->blockFactory;
     }
-
+    
     /**
      * @return Block
      */
@@ -198,7 +199,7 @@ class CmsInstaller extends AbstractInstaller
     {
         return $this->isStrictMode;
     }
-
+    
     /**
      * @param $value
      */
@@ -206,11 +207,11 @@ class CmsInstaller extends AbstractInstaller
     {
         $this->isStrictMode = (bool) $value;
     }
-
+    
     /*********************************************************************************************/
     /****************************************************************************** CRUD - Page **/
     /*********************************************************************************************/
-
+    
     /**
      * @param $id
      * @param null|array $storeIds
@@ -222,16 +223,16 @@ class CmsInstaller extends AbstractInstaller
         if (is_numeric($id)) {
             return $this->getPageModel()->load($id);
         }
-
+        
         $storeIds = $this->getStoreIds($storeIds);
         $collection = $this->getPageCollection()
             ->addFieldToFilter('identifier', array('eq' => $id))
             ->addStoreFilter($storeIds);
-
+        
         return ($collection->count()) ? $collection->getFirstItem() : null;
-
+        
     }
-
+    
     public function createPage($id, $content, $storeIds = null, $params = [])
     {
         // Validate Already Exists
@@ -243,7 +244,7 @@ class CmsInstaller extends AbstractInstaller
             }
             return $this->updatePage($id, $content, $storeIds, $params);
         }
-
+        
         // Create New
         $params = array_merge($this->defaultPageData, $params);
         $stores = $this->getStoreIds($storeIds);
@@ -258,7 +259,7 @@ class CmsInstaller extends AbstractInstaller
             ->save();
         return $page->save();
     }
-
+    
     /**
      * @param $id
      * @param null $content
@@ -277,7 +278,7 @@ class CmsInstaller extends AbstractInstaller
             }
             return null;
         }
-
+        
         // Update Data
         $page->setStores($this->getStoreIds($storeIds));
         if ($content) {
@@ -289,7 +290,7 @@ class CmsInstaller extends AbstractInstaller
         }
         return $page->save();
     }
-
+    
     public function deletePage($id, $storeIds = null)
     {
         $page = $this->getPage($id, $storeIds);
@@ -303,7 +304,7 @@ class CmsInstaller extends AbstractInstaller
         $page->delete();
         return $this;
     }
-
+    
     public function deleteAllPages()
     {
         foreach ($this->getPageCollection() as $page) {
@@ -311,7 +312,7 @@ class CmsInstaller extends AbstractInstaller
         }
         return $this;
     }
-
+    
     /*********************************************************************************************/
     /***************************************************************************** CRUD - Block **/
     /*********************************************************************************************/
@@ -428,11 +429,11 @@ class CmsInstaller extends AbstractInstaller
         return $this;
     }
     
-
+    
     /*********************************************************************************************/
     /*********************************************************************** Internal Functions **/
     /*********************************************************************************************/
-
+    
     protected function getStores()
     {
         if (!$this->stores) {
@@ -440,7 +441,7 @@ class CmsInstaller extends AbstractInstaller
         }
         return $this->stores;
     }
-
+    
     protected function getStoreId($id)
     {
         // CASE: is an ID
@@ -459,7 +460,7 @@ class CmsInstaller extends AbstractInstaller
         }
         return null;
     }
-
+    
     protected function getStoreIds($stores = null)
     {
         // Default Case
@@ -483,19 +484,170 @@ class CmsInstaller extends AbstractInstaller
     }
     
     /*********************************************************************************************/
+    /*********************************************************************** Export Functions **/
+    /*********************************************************************************************/
+    
+    public function createContentFile($entityType,$contentType,$identifier,$content)
+    {
+        $filename =  $entityType . DIRECTORY_SEPARATOR . $identifier . '.' . $contentType;
+        $folder = $this->getContentFolder() . DIRECTORY_SEPARATOR;
+        
+        // Write
+        $this->fileIo->write($folder . $filename,$content);
+        
+        return $filename;
+        
+    }
+    
+    
+    public function createContentBlockHtmlFile($identifier,$content)
+    {
+        return $this->createContentFile('block','html',$identifier,$content);
+    }
+    
+    public function createContentPageHtmlFile($identifier,$content)
+    {
+        return $this->createContentFile('page','html',$identifier,$content);
+    }
+    
+    public function createContentPageXmlFile($identifier,$content)
+    {
+        return $this->createContentFile('page','xml',$identifier,$content);
+    }
+    
+    public function createPhpPageListFile($content)
+    {
+        return $this->createContentFile('page','php','page-list',$content);
+    }
+    
+    public function createPhpBlockListFile($content)
+    {
+        return $this->createContentFile('block','php','block-list',$content);
+    }
+    
+    /**
+     * @param null $storeIds
+     * @param array $filters
+     * @return $this
+     */
+    public function exportBlocksData($storeIds = null, $filters = [])
+    {
+        $data = [];
+        $collection = $this->getBlockCollection();
+        
+        if(null !== $storeIds) {
+            $collection->addStoreFilter($storeIds,false);
+        }
+        foreach($filters as $field => $filter) {
+            $collection->addFieldToFilter($field,$filter);
+        }
+        
+        foreach ($collection as $item) {
+            /* @var $item Block */
+            
+            $ids = [];
+            $data[$item->getIdentifier()] = [
+                'id' => $item->getIdentifier(),
+                'content_file' => $this->createContentBlockHtmlFile($item->getIdentifier(),$item->getContent()),
+                'store_id' => $item->getStores(),
+                'params' => [
+                    'title' => $item->getTitle(),
+                    'is_active' => $item->isActive(),
+                ],
+            ];
+        }
+        
+        $phpFileContent = "<?php\n";
+        $phpFileContent .= '$list = ';
+        $phpFileContent .= $this->formattedExport($data);
+        $phpFileContent .= ";\n";
+        
+        $this->createPhpBlockListFile($phpFileContent);
+        
+        return $this;
+
+
+////        use Zend\Code\Generator\ValueGenerator;
+//        $generator = $this->objectManager->create('Zend\Code\Generator\ValueGenerator');
+//        /* @var $generator ValueGenerator */
+//        $generator->setIndentation('    '); // 2 spaces
+//        $generator->setValue($data);
+//        $generator->getType(ValueGenerator::TYPE_ARRAY);
+//        echo "\n ---- --- EXPORT --- ---\n";
+//        echo $this->formattedExport($data);
+//        var_export($data);
+//        echo "\n ---- --- EXPORT --- ---\n";
+//        die();
+    
+    }
+    
+    /**
+     * @param null $storeIds
+     * @param array $filters
+     * @return $this
+     */
+    public function exportPagesData($storeIds = null, $filters = [])
+    {
+        $data = [];
+        $collection = $this->getPageCollection();
+        
+        if(null !== $storeIds) {
+            $collection->addStoreFilter($storeIds,false);
+        }
+        foreach($filters as $field => $filter) {
+            $collection->addFieldToFilter($field,$filter);
+        }
+        
+        foreach ($collection as $item) {
+            /* @var $item Page */
+            $ids = [];
+            $data[$item->getIdentifier()] = [
+                'id' => $item->getIdentifier(),
+                'content_file' => $this->createContentPageHtmlFile($item->getIdentifier(),$item->getContent()),
+                'layout_file' => $this->createContentPageXmlFile($item->getIdentifier(),$item->getLayoutUpdateXml()),
+                'store_id' => $item->getStores(),
+                'params' => [
+                    'title' => $item->getTitle(),
+                    'is_active' => $item->isActive(),
+                    'title' => $item->getTitle(),
+                    'page_layout' => $item->getPageLayout(),
+                    'content_heading' => $item->getContentHeading(),
+                    // Meta
+                    'meta_title' => $item->getMetaTitle(),
+                    'meta_description' => $item->getMetaDescription(),
+                    'meta_keywords' => $item->getMetaKeywords(),
+                ],
+            ];
+        }
+        
+        
+        $phpFileContent = "<?php\n";
+        $phpFileContent .= '$list = ';
+        $phpFileContent .= $this->formattedExport($data);
+        $phpFileContent .= ";\n";
+        
+        $this->createPhpPageListFile($phpFileContent);
+        
+        return $this;
+        
+    }
+    
+    
+    /*********************************************************************************************/
     /*********************************************************************** Internal Functions **/
     /*********************************************************************************************/
     
     /**
+     * @todo Move to Abstract
+     *
      * @param $filename
      * @param null $folder
      * @return null
+     *
      */
     public function getFileContent($filename, $folder = null)
     {
         $path = $this->getContentFolder($folder) . DIRECTORY_SEPARATOR . $filename;
-        
-        var_dump('EVALUATING: ' . $path);
         
         // Exists
         if(!$this->fileIo->fileExists($path)) {
@@ -506,11 +658,16 @@ class CmsInstaller extends AbstractInstaller
         return (empty($content)) ? null : $content;
     }
     
+    /**
+     * @todo Move to Abstract
+     * @param null $folder
+     * @return string
+     */
     public function getContentFolder($folder = null)
     {
         $folder = ($folder) ?: 'content';
         $moduleDir = $this->reader->getModuleDir('',$this->getModuleName());
         return $moduleDir . DIRECTORY_SEPARATOR . $folder;
     }
-
+    
 }

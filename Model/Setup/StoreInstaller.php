@@ -383,7 +383,19 @@ class StoreInstaller extends AbstractInstaller
         $this->setConfig($path, $value, $scopeType, $scopeCode);
         return $this;
     }
-
+    
+    /**
+     * @param $code
+     * @return Theme|null
+     */
+    public function getThemeByCode($code)
+    {
+        $theme = $this->themeFactory->create()->load($code, 'code');
+        if($theme->getId()) {
+            return $theme;
+        }
+        return null;
+    }
 
     /**
      * @param array $configSchema
@@ -423,7 +435,7 @@ class StoreInstaller extends AbstractInstaller
         }
 
         // Store Theme Config
-        foreach ($this->getConfigKey($configSchema, 'store') as $code => $themeCode) {
+        foreach ($this->getConfigKey($configSchema, 'stores') as $code => $themeCode) {
             $store = $this->getStore($code);
             $theme = $this->themeFactory->create()->load($themeCode, 'code');
             // Store Validation
@@ -449,7 +461,7 @@ class StoreInstaller extends AbstractInstaller
 
     /**
      *
-     * @TODO Refactor - This Method... Really Sucks
+     * @TODO Refactor - This Method... Sucks a lot
      *
      * @param array $data
      * @return $this
